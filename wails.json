@@ -10,5 +10,13 @@
   "author": {
     "name": "Iskander",
     "email": "iskandervdh@gmail.com"
+  },
+
+  "Info": {
+    "companyName": "iskandervdh",
+    "productName": "Spinup",
+    "productVersion": "0.0.1",
+    "copyright": "MIT",
+    "comments": "Quickly spin up your multi command projects."
   }
 }
