@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/iskandervdh/spinup/common"
+	"github.com/iskandervdh/spinup/config"
 	"github.com/iskandervdh/spinup/core"
 )
 
@@ -62,4 +63,8 @@ func (a *App) RunProject(projectName string) error {
 	}
 
 	return nil
+}
+
+func (a *App) GetVersion() string {
+	return config.Version
 }
