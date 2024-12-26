@@ -29,28 +29,6 @@ func (a *App) Startup(ctx context.Context) {
 	}
 }
 
-func (a *App) GetProjects() core.Projects {
-	projects, err := a.core.GetProjects()
-
-	if err != nil {
-		fmt.Println("Error getting projects:", err)
-		return nil
-	}
-
-	return projects
-}
-
-func (a *App) GetCommands() core.Commands {
-	commands, err := a.core.GetCommands()
-
-	if err != nil {
-		fmt.Println("Error getting commands:", err)
-		return nil
-	}
-
-	return commands
-}
-
 func (a *App) GetVersion() string {
 	return config.Version
 }
