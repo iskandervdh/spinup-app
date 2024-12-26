@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { PageTitle } from '../components/page-title';
-import { GetCommands } from '../../wailsjs/go/main/App';
+import { GetCommands } from '../../wailsjs/go/app/App';
 import { Commands } from '../types';
 
 export function CommandsPage() {

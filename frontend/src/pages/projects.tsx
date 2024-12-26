@@ -1,14 +1,30 @@
 import { PlayIcon, StopIcon } from '@heroicons/react/20/solid';
-import { GetProjects } from '../../wailsjs/go/main/App';
+import { GetProjects } from '../../wailsjs/go/app/App';
 import { useCallback, useEffect, useMemo } from 'react';
 import { PageTitle } from '../components/page-title';
 import { useProjectsStore } from '../stores/projectsStore';
 import { Project } from '~/types';
 
+import { BrowserOpenURL } from 'wjs/runtime/runtime';
+
 function ProjectInfo({ name, project }: { name: string; project: Project }) {
   const { runningProjects, runProject, stopProject } = useProjectsStore();
 
   const isRunning = useMemo(() => runningProjects.includes(name), [runningProjects]);
+
+  const commands = useMemo(() => project.commands.join(', '), [project.commands]);
+
+  const variables = useMemo(() => {
+    return Object.entries(project.variables)
+      .map(([key, value]) => `${key}=${value}`)
+      .join(', ');
+  }, [project.variables]);
+
+  const domainAliases = useMemo(() => project.domainAliases.join(', '), [project.domainAliases]);
+
+  const openProjectInBrowser = useCallback(() => {
+    BrowserOpenURL(`http://${project.domain}`);
+  }, [project.domain]);
 
   const startOrStopProject = useCallback(async () => {
     if (isRunning) {
@@ -21,7 +37,11 @@ function ProjectInfo({ name, project }: { name: string; project: Project }) {
   return (
     <div key={name}>
       <div className="flex items-center gap-2 mb-2">
-        <button className="p-2 rounded-lg hover:bg-black/10" onClick={startOrStopProject}>
+        <button
+          className="p-2 rounded-lg hover:bg-black/10 disabled:cursor-not-allowed"
+          onClick={startOrStopProject}
+          disabled={project.dir ? undefined : true}
+        >
           {isRunning ? (
             <StopIcon width={20} height={20} className="text-red-400" />
           ) : (
@@ -34,19 +54,32 @@ function ProjectInfo({ name, project }: { name: string; project: Project }) {
 
       <div className="grid max-w-6xl grid-cols-2">
         <div>Domain</div>
-        <div className="text-sm">{project.domain}</div>
+
+        {isRunning ? (
+          <div
+            onClick={openProjectInBrowser}
+            className="text-sm underline cursor-pointer text-info hover:text-info-dark"
+          >
+            {project.domain}
+          </div>
+        ) : (
+          <div className="text-sm">{project.domain}</div>
+        )}
 
         <div>Port</div>
         <div className="text-sm">{project.port}</div>
 
         <div>Commands</div>
-        <div className="text-sm">{project.commands.join(', ')}</div>
+        {commands !== '' ? <div className="text-sm">{commands}</div> : <div className="text-sm text-error">-</div>}
 
         <div>Directory</div>
-        <div className="text-sm">{project.dir ?? 'No directory specified'}</div>
+        <div className="text-sm">{project.dir ?? '-'}</div>
 
         <div>Variables</div>
-        <div className="text-sm">{JSON.stringify(project.variables)}</div>
+        <div className="text-sm">{variables || '-'}</div>
+
+        <div>Domain aliases</div>
+        <div className="text-sm">{domainAliases || '-'}</div>
       </div>
     </div>
   );

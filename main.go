@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 
+	"github.com/iskandervdh/spinup-app/app"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
@@ -12,7 +13,7 @@ import (
 var assets embed.FS
 
 func main() {
-	app := NewApp()
+	app := app.NewApp()
 
 	err := wails.Run(&options.App{
 		Title:  "Spinup",
@@ -22,7 +23,7 @@ func main() {
 			Assets: assets,
 		},
 		BackgroundColour: &options.RGBA{R: 27, G: 38, B: 54, A: 1},
-		OnStartup:        app.startup,
+		OnStartup:        app.Startup,
 		Bind: []interface{}{
 			app,
 		},

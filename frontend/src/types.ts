@@ -4,6 +4,7 @@ export type Project = {
   commands: string[];
   dir: string | null;
   variables: Record<string, unknown>;
+  domainAliases: string[];
 };
 
 export type Projects = Record<string, Project>;

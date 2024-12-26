@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { PageTitle } from '../components/page-title';
-import { GetVersion } from 'wjs/go/main/App';
+import { GetVersion } from 'wjs/go/app/App';
 import { Select } from '~/components/select';
 
 export function SettingsPage() {
@@ -18,8 +18,8 @@ export function SettingsPage() {
         <div className="flex flex-col gap-2">
           <h2 className="text-xl font-bold text-primary">Info</h2>
 
-          <div className="grid max-w-6xl grid-cols-2">
-            <label htmlFor="action-on-crash">Action on crash (example, WIP)</label>
+          <div className="grid items-center max-w-6xl grid-cols-2">
+            <div>Action on crash (example, WIP)</div>
 
             <div className="w-full min-w-32 max-w-64">
               <Select id="action-on-crash" name="Action on crash">

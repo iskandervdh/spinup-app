@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { Projects } from '../types';
-// import { RunProject } from 'wjs/go/main/App';
+import { RunProject, StopProject } from 'wjs/go/app/App';
 
 interface ProjectsState {
   projects: Projects | null;
@@ -19,9 +19,11 @@ export const useProjectsStore = create<ProjectsState>((set) => ({
   async runProject(project: string) {
     set((state) => ({ runningProjects: [...state.runningProjects, project] }));
 
-    // RunProject(project);
+    await RunProject(project);
   },
   async stopProject(project: string) {
     set((state) => ({ runningProjects: state.runningProjects.filter((p) => p !== project) }));
+
+    await StopProject(project);
   },
 }));
