@@ -21,6 +21,34 @@ func (a *App) GetProjects() core.Projects {
 	return projects
 }
 
+func (a *App) AddProject(name string, domain string, port int, commandNames []string) error {
+	err := a.core.GetCommandsConfig()
+
+	if err != nil {
+		fmt.Println("Error getting commands config:", err)
+	}
+
+	msg := a.core.AddProject(name, domain, port, commandNames)
+
+	if _, ok := msg.(*common.ErrMsg); ok {
+		fmt.Println(msg.GetText())
+		return fmt.Errorf("%s", msg.GetText())
+	}
+
+	return nil
+}
+
+func (a *App) RemoveProject(name string) error {
+	msg := a.core.RemoveProject(name)
+
+	if _, ok := msg.(*common.ErrMsg); ok {
+		fmt.Println(msg.GetText())
+		return fmt.Errorf("%s", msg.GetText())
+	}
+
+	return nil
+}
+
 func (a *App) SelectProjectDirectory(projectName string) error {
 	defaultDir, err := os.UserHomeDir()
 
@@ -50,4 +78,27 @@ func (a *App) SelectProjectDirectory(projectName string) error {
 	}
 
 	return nil
+}
+
+func (a *App) GetProjectLogs(projectName string) (string, error) {
+	runningProject, ok := a.runningProjects[projectName]
+
+	if !ok {
+		return "", fmt.Errorf("project '%s' is not running", projectName)
+	}
+
+	logFilePath, err := runningProject.GetLogFilePath()
+
+	if err != nil {
+		fmt.Println(err)
+		return "", fmt.Errorf("no logs available for project '%s'", projectName)
+	}
+
+	logs, err := os.ReadFile(logFilePath)
+
+	if err != nil {
+		return "", fmt.Errorf("error reading logs for project '%s': %s", projectName, err)
+	}
+
+	return string(logs), nil
 }

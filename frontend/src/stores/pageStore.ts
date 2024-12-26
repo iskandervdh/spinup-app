@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 
-export const PAGES = ['Projects', 'Commands', 'Settings'] as const;
+export const NAV_PAGES = ['Projects', 'Commands', 'Settings'] as const;
+export const PAGES = [...NAV_PAGES, 'AddProject'] as const;
 export type Page = (typeof PAGES)[number];
 
 interface PageState {
@@ -10,5 +11,5 @@ interface PageState {
 
 export const usePageStore = create<PageState>((set) => ({
   currentPage: PAGES[0],
-  setCurrentPage: (page: Page) => set(() => ({ currentPage: page })),
+  setCurrentPage: (page) => set(() => ({ currentPage: page })),
 }));

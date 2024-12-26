@@ -1,5 +1,5 @@
 import logo from '../assets/images/icon.svg';
-import { Page, PAGES, usePageStore } from '../stores/pageStore';
+import { NAV_PAGES, Page, PAGES, usePageStore } from '../stores/pageStore';
 
 function NavbarItem({ page }: { page: Page }) {
   const { currentPage, setCurrentPage } = usePageStore();
@@ -32,7 +32,7 @@ export function Navbar() {
       />
 
       <ul className="flex gap-8">
-        {PAGES.map((page) => (
+        {NAV_PAGES.map((page) => (
           <NavbarItem key={page} page={page} />
         ))}
       </ul>

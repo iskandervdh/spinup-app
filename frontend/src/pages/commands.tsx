@@ -1,18 +1,20 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { PageTitle } from '../components/page-title';
 import { GetCommands } from '../../wailsjs/go/app/App';
-import { Commands } from '../types';
+import { useCommandsStore } from '~/stores/commandsStore';
 
 export function CommandsPage() {
-  const [commands, setProjects] = useState<Commands | null>(null);
+  const { commands, setCommands } = useCommandsStore();
 
   useEffect(() => {
-    GetCommands().then(setProjects);
+    GetCommands().then(setCommands);
   }, []);
 
   return (
     <div id="commands">
-      <PageTitle>Commands</PageTitle>
+      <div className="pb-4">
+        <PageTitle>Commands</PageTitle>
+      </div>
 
       <div className="flex flex-col gap-4">
         {commands ? (

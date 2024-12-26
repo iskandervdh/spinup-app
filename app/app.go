@@ -11,7 +11,7 @@ import (
 type App struct {
 	ctx             context.Context
 	core            *core.Core
-	runningProjects map[string]runningProject
+	runningProjects map[string]*runningProject
 }
 
 func NewApp() *App {

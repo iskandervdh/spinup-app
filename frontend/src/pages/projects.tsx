@@ -1,15 +1,25 @@
-import { PlayIcon, StopIcon, ExclamationTriangleIcon } from '@heroicons/react/20/solid';
+import {
+  PlayIcon,
+  StopIcon,
+  ExclamationTriangleIcon,
+  ArrowPathIcon,
+  PlusIcon,
+  TrashIcon,
+  DocumentTextIcon,
+} from '@heroicons/react/20/solid';
 import { GetProjects } from '../../wailsjs/go/app/App';
 import { useCallback, useEffect, useMemo } from 'react';
 import { PageTitle } from '../components/page-title';
 import { useProjectsStore } from '../stores/projectsStore';
 import { Project } from '~/types';
-
 import { BrowserOpenURL } from 'wjs/runtime/runtime';
 import { Button } from '~/components/button';
+import { usePageStore } from '~/stores/pageStore';
+import { LogsPopover } from '~/components/logs-popover';
 
 function ProjectInfo({ name, project }: { name: string; project: Project }) {
-  const { runningProjects, runProject, stopProject, selectProjectDir } = useProjectsStore();
+  const { runningProjects, runProject, stopProject, selectProjectDir, removeProject, setCurrentProject } =
+    useProjectsStore();
 
   const isRunning = useMemo(() => runningProjects.includes(name), [runningProjects]);
   const commands = useMemo(() => project.commands.join(', '), [project.commands]);
@@ -39,6 +49,20 @@ function ProjectInfo({ name, project }: { name: string; project: Project }) {
     }
   }, [isRunning]);
 
+  const showLogs = useCallback(() => {
+    if (isRunning) {
+      setCurrentProject(name);
+    } else {
+      alert('Project is not running');
+    }
+  }, [name, isRunning]);
+
+  const remove = useCallback(() => {
+    if (confirm(`Are you sure you want to remove project "${name}"?`)) {
+      removeProject(name);
+    }
+  }, [name]);
+
   return (
     <div key={name}>
       <div className="flex items-center gap-2 mb-2">
@@ -56,7 +80,17 @@ function ProjectInfo({ name, project }: { name: string; project: Project }) {
           </div>
         )}
 
-        <h3 className="text-xl font-bold text-primary">{name}</h3>
+        <div className="flex items-center gap-2">
+          <h3 className="text-xl font-bold text-primary">{name}</h3>
+
+          <Button onClick={showLogs}>
+            <DocumentTextIcon width={16} height={16} className="m-1 text-current" />
+          </Button>
+
+          <Button onClick={remove}>
+            <TrashIcon width={16} height={16} className="m-1 text-current" />
+          </Button>
+        </div>
       </div>
 
       <div className="grid max-w-6xl grid-cols-2">
@@ -99,6 +133,7 @@ function ProjectInfo({ name, project }: { name: string; project: Project }) {
 }
 
 export function ProjectsPage() {
+  const { setCurrentPage } = usePageStore();
   const { projects, setProjects } = useProjectsStore();
 
   useEffect(() => {
@@ -107,7 +142,21 @@ export function ProjectsPage() {
 
   return (
     <div id="projects">
-      <PageTitle>Projects</PageTitle>
+      <div className="flex items-center gap-4 pb-4">
+        <PageTitle>Projects</PageTitle>
+
+        <LogsPopover />
+
+        <div className="flex gap-2">
+          <Button onClick={() => GetProjects().then(setProjects)}>
+            <ArrowPathIcon width={24} height={24} className="m-1 text-current" />
+          </Button>
+
+          <Button onClick={() => setCurrentPage('AddProject')}>
+            <PlusIcon width={24} height={24} className="m-1 text-current" />
+          </Button>
+        </div>
+      </div>
 
       <div className="flex flex-col gap-4">
         {projects ? (

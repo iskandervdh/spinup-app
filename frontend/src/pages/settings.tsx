@@ -12,7 +12,9 @@ export function SettingsPage() {
 
   return (
     <div>
-      <PageTitle>Settings</PageTitle>
+      <div className="pb-4">
+        <PageTitle>Settings</PageTitle>
+      </div>
 
       <div className="flex flex-col gap-8">
         <div className="flex flex-col gap-2">

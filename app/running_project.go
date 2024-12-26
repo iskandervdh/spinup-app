@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/iskandervdh/spinup/common"
@@ -87,9 +88,17 @@ func (rp *runningProject) useLogFile(projectName string) error {
 	return nil
 }
 
+func (rp *runningProject) GetLogFilePath() (string, error) {
+	if rp.logFile == nil {
+		return "", errors.New("no logs available for project")
+	}
+
+	return rp.logFile.Name(), nil
+}
+
 func (a *App) RunProject(projectName string) error {
 	if a.runningProjects == nil {
-		a.runningProjects = make(map[string]runningProject)
+		a.runningProjects = make(map[string]*runningProject)
 	}
 
 	if _, ok := a.runningProjects[projectName]; ok {
@@ -98,7 +107,7 @@ func (a *App) RunProject(projectName string) error {
 
 	runningProject := NewRunningProject()
 
-	a.runningProjects[projectName] = *runningProject
+	a.runningProjects[projectName] = runningProject
 
 	err := runningProject.useLogFile(projectName)
 
@@ -130,7 +139,7 @@ func (a *App) StopProject(projectName string) string {
 	}
 
 	sigChan := runningProject.core.GetSigChan()
-	sigChan <- os.Interrupt
+	*sigChan <- syscall.SIGINT
 
 	if runningProject, ok := a.runningProjects[projectName]; ok {
 		runningProject.logFile.Close()
