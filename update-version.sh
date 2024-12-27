@@ -2,8 +2,8 @@
 
 ### This script updates the version number in the .version file
 
-# Get the current version number from the .version file
-VERSION=`cat .version`
+# Get the current version number from the app/.version file
+VERSION=`cat app/.version`
 
 # Increment the version number based on the argument passed to the script
 if [ "$1" = "major" ]; then
@@ -23,11 +23,11 @@ else
     exit 1
 fi
 
-# Write the new version number to the .version file
-echo $VERSION > .version
+# Write the new version number to the app/.version file
+echo $VERSION > app/.version
 
 # Commit the change to the repository
-git add .version
+git add app/.version
 
 # Create a new commit with the updated version number
 git commit -m "Bumped version number to $VERSION"

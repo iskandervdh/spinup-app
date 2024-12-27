@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react';
 import { PageTitle } from '../components/page-title';
-import { GetVersion } from 'wjs/go/app/App';
+import { GetAppVersion, GetSpinupVersion } from 'wjs/go/app/App';
 import { Select } from '~/components/select';
 
 export function SettingsPage() {
-  const [version, setVersion] = useState<string | null>(null);
+  const [spinupVersion, setSpinupVersion] = useState<string | null>(null);
+  const [appVersion, setAppVersion] = useState<string | null>(null);
 
   useEffect(() => {
-    GetVersion().then(setVersion);
+    GetSpinupVersion().then(setSpinupVersion);
+    GetAppVersion().then(setAppVersion);
   }, []);
 
   return (
@@ -37,10 +39,10 @@ export function SettingsPage() {
 
           <div className="grid max-w-6xl grid-cols-2">
             <div>Spinup version</div>
-            <div>{version}</div>
+            <div>{spinupVersion}</div>
 
-            <div>Spinup app version</div>
-            <div>dev</div>
+            <div>App version</div>
+            <div>{appVersion}</div>
           </div>
         </div>
       </div>

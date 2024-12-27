@@ -2,11 +2,15 @@ package app
 
 import (
 	"context"
+	_ "embed"
 	"fmt"
 
 	"github.com/iskandervdh/spinup/config"
 	"github.com/iskandervdh/spinup/core"
 )
+
+//go:embed .version
+var version string
 
 type App struct {
 	ctx             context.Context
@@ -29,6 +33,10 @@ func (a *App) Startup(ctx context.Context) {
 	}
 }
 
-func (a *App) GetVersion() string {
+func (a *App) GetSpinupVersion() string {
 	return config.Version
+}
+
+func (a *App) GetAppVersion() string {
+	return version
 }
