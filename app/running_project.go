@@ -39,6 +39,7 @@ func NewRunningProject() *runningProject {
 
 	go func() {
 		defer msgChanWg.Done()
+		defer rp.logFile.Close()
 
 		for msg := range *rp.msgChan {
 			// If there is no log file linked to the currently running project
@@ -53,7 +54,7 @@ func NewRunningProject() *runningProject {
 			_, err := rp.logFile.Write([]byte(fmt.Sprintln(msg.GetText())))
 
 			if err != nil {
-				fmt.Println(err)
+				fmt.Println("Error writing to log file:", err)
 			}
 		}
 	}()
@@ -141,9 +142,7 @@ func (a *App) StopProject(projectName string) string {
 	sigChan := runningProject.core.GetSigChan()
 	*sigChan <- syscall.SIGINT
 
-	if runningProject, ok := a.runningProjects[projectName]; ok {
-		runningProject.logFile.Close()
-
+	if _, ok := a.runningProjects[projectName]; ok {
 		delete(a.runningProjects, projectName)
 
 		return fmt.Sprintf("project '%s' stopped", projectName)

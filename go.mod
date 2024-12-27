@@ -5,7 +5,7 @@ go 1.22.0
 toolchain go1.23.4
 
 require (
-	github.com/iskandervdh/spinup v0.8.0
+	github.com/iskandervdh/spinup v0.8.1
 	github.com/wailsapp/wails/v2 v2.9.2
 )
 
