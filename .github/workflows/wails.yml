@@ -15,13 +15,13 @@ jobs:
       fail-fast: false
       matrix:
         build:
-          - name: 'App'
+          - name: 'Spinup'
             platform:  'linux/amd64'
             os: 'ubuntu-22.04'
-          # - name: 'App'
+          # - name: 'Spinup'
           #   platform:  'windows/amd64'
           #   os: 'windows-latest'
-          # - name: 'App'
+          # - name: 'Spinup'
           #   platform:  'darwin/universal'
           #   os: 'macos-latest'
 
@@ -32,6 +32,11 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
       - name: Build wails
         uses: dAppServer/wails-build-action@v2.2
         id: build
@@ -40,3 +45,4 @@ jobs:
           build-platform: ${{ matrix.build.platform }}
           package: false
           go-version: '1.23'
+          node-version: '22.x'
