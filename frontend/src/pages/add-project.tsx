@@ -5,10 +5,13 @@ import { Select } from '~/components/select';
 import { useCommandsStore } from '~/stores/commandsStore';
 import { useProjectsStore } from '~/stores/projectsStore';
 import { GetCommands } from 'wjs/go/app/App';
+import { Button } from '~/components/button';
+import { usePageStore } from '~/stores/pageStore';
 
 export function AddProjectPage() {
   const { commands, setCommands } = useCommandsStore();
   const { addProject } = useProjectsStore();
+  const { setCurrentPage } = usePageStore();
 
   const [name, setName] = useState('');
   const [domain, setDomain] = useState('');
@@ -19,7 +22,13 @@ export function AddProjectPage() {
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
 
-      await addProject(name, domain, port, commandNames);
+      try {
+        await addProject(name, domain, port, commandNames);
+        setCurrentPage('Projects');
+      } catch (e) {
+        // TODO: Show error toast
+        console.error(e);
+      }
     },
     [name, domain, port, commandNames, addProject]
   );
@@ -70,7 +79,7 @@ export function AddProjectPage() {
           ))}
       </Select>
 
-      <button type="submit">Add Project</button>
+      <Button type="submit">Add Project</Button>
     </form>
   );
 }

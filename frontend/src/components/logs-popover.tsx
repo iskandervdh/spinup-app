@@ -1,11 +1,11 @@
 import { XMarkIcon } from '@heroicons/react/20/solid';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useProjectsStore } from '~/stores/projectsStore';
 import { GetProjectLogs } from 'wjs/go/app/App';
 import AnsiToHtml from 'ansi-to-html';
 
 export function LogsPopover() {
-  const ansiToHtml = new AnsiToHtml();
+  const ansiToHtml = useMemo(() => new AnsiToHtml(), []);
 
   const { currentProject, setCurrentProject } = useProjectsStore();
   const [logs, setLogs] = useState('');

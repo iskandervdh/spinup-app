@@ -7,7 +7,6 @@ import (
 	"path"
 	"sync"
 	"syscall"
-	"time"
 
 	"github.com/iskandervdh/spinup/common"
 	"github.com/iskandervdh/spinup/core"
@@ -64,7 +63,7 @@ func NewRunningProject() *runningProject {
 
 func (rp *runningProject) useLogFile(projectName string) error {
 	configDir := rp.core.GetConfig().GetConfigDir()
-	logDirPath := path.Join(configDir, "logs", projectName)
+	logDirPath := path.Join(configDir, "logs")
 
 	// Make a log directory for the project if it does not exist
 	err := os.MkdirAll(logDirPath, 0755)
@@ -74,7 +73,7 @@ func (rp *runningProject) useLogFile(projectName string) error {
 	}
 
 	// Determine the name of the log file
-	logFilePath := path.Join(logDirPath, time.Now().Format("2006-01-02_15:04:05")+".log")
+	logFilePath := path.Join(logDirPath, projectName+".log")
 	logFile, err := os.Create(logFilePath)
 
 	if err != nil {

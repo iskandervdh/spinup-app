@@ -16,7 +16,7 @@ interface ProjectsState {
   runningProjects: string[];
   runProject: (projectName: string) => Promise<void>;
   stopProject: (projectName: string) => Promise<void>;
-  selectProjectDir: (projectName: string) => Promise<void>;
+  selectProjectDir: (projectName: string, defaultDir: string | null) => Promise<void>;
   addProject: (projectName: string, domain: string, port: number, commandNames: string[]) => Promise<void>;
   removeProject: (projectName: string) => Promise<void>;
 
@@ -39,8 +39,8 @@ export const useProjectsStore = create<ProjectsState>((set) => ({
 
     await StopProject(projectName);
   },
-  async selectProjectDir(projectName) {
-    await SelectProjectDirectory(projectName);
+  async selectProjectDir(projectName, defaultDir) {
+    await SelectProjectDirectory(projectName, defaultDir ?? '');
 
     const projects = await GetProjects();
     set(() => ({ projects }));

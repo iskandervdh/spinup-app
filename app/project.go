@@ -49,11 +49,15 @@ func (a *App) RemoveProject(name string) error {
 	return nil
 }
 
-func (a *App) SelectProjectDirectory(projectName string) error {
-	defaultDir, err := os.UserHomeDir()
+func (a *App) SelectProjectDirectory(projectName string, defaultDir string) error {
+	if defaultDir == "" {
+		d, err := os.UserHomeDir()
 
-	if err != nil {
-		defaultDir = ""
+		if err != nil {
+			defaultDir = ""
+		} else {
+			defaultDir = d
+		}
 	}
 
 	dir, err := runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{

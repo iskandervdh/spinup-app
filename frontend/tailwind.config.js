@@ -10,9 +10,9 @@ export default {
 
         info: '#5dade2',
         'info-dark': '#3297da',
-        success: '#a7e08f',
+        success: '#88d567',
         warning: '#ffd700',
-        error: '#d90909',
+        error: '#c94b55',
       },
       fontFamily: {
         azeret: ['Azeret'],

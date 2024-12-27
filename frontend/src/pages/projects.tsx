@@ -6,6 +6,8 @@ import {
   PlusIcon,
   TrashIcon,
   DocumentTextIcon,
+  PencilSquareIcon,
+  FolderIcon,
 } from '@heroicons/react/20/solid';
 import { GetProjects } from '../../wailsjs/go/app/App';
 import { useCallback, useEffect, useMemo } from 'react';
@@ -41,6 +43,10 @@ function ProjectInfo({ name, project }: { name: string; project: Project }) {
     BrowserOpenURL(`http://${project.domain}`);
   }, [project.domain]);
 
+  const openProjectDir = useCallback(() => project.dir && BrowserOpenURL(project.dir), [project.dir]);
+
+  const openSelectProjectDir = useCallback(() => selectProjectDir(name, project.dir), [name, project.dir]);
+
   const startOrStopProject = useCallback(async () => {
     if (isRunning) {
       await stopProject(name);
@@ -67,7 +73,11 @@ function ProjectInfo({ name, project }: { name: string; project: Project }) {
     <div key={name}>
       <div className="flex items-center gap-2 mb-2">
         {canRunProject ? (
-          <button className="p-2 rounded-lg hover:bg-black/10" onClick={startOrStopProject}>
+          <button
+            className="p-2 rounded-lg hover:bg-black/10"
+            onClick={startOrStopProject}
+            title={isRunning ? `Stop project ${name}` : `Start project ${name}`}
+          >
             {isRunning ? (
               <StopIcon width={20} height={20} className="text-red-400" />
             ) : (
@@ -81,19 +91,21 @@ function ProjectInfo({ name, project }: { name: string; project: Project }) {
         )}
 
         <div className="flex items-center gap-2">
-          <h3 className="text-xl font-bold text-primary">{name}</h3>
+          <h3 className="pr-2 text-xl font-bold text-primary">{name}</h3>
 
-          <Button onClick={showLogs}>
-            <DocumentTextIcon width={16} height={16} className="m-1 text-current" />
-          </Button>
-
-          <Button onClick={remove}>
-            <TrashIcon width={16} height={16} className="m-1 text-current" />
-          </Button>
+          {isRunning ? (
+            <Button onClick={showLogs} size={'icon'} variant={'info'} title={`Show logs for project ${name}`}>
+              <DocumentTextIcon width={16} height={16} className="text-current" />
+            </Button>
+          ) : (
+            <Button onClick={remove} size={'icon'} variant={'error'} title={`Remove project ${name}`}>
+              <TrashIcon width={16} height={16} className="text-current" />
+            </Button>
+          )}
         </div>
       </div>
 
-      <div className="grid max-w-6xl grid-cols-2">
+      <div className="grid items-center max-w-6xl grid-cols-[16rem,auto] gap-x-4">
         <div>Domain</div>
 
         {isRunning ? (
@@ -115,10 +127,20 @@ function ProjectInfo({ name, project }: { name: string; project: Project }) {
 
         <div>Directory</div>
         {project.dir ? (
-          <div className="text-sm">{project.dir}</div>
+          <div className="flex items-center gap-2 py-1">
+            <Button onClick={openProjectDir} size={'xs'} title={`Open project directory for ${name}`}>
+              <FolderIcon width={16} height={16} className="text-current" />
+            </Button>
+
+            <Button onClick={openSelectProjectDir} size={'xs'} title={`Change project directory for ${name}`}>
+              <PencilSquareIcon width={16} height={16} className="text-current" />
+            </Button>
+          </div>
         ) : (
-          <div className="w-full min-w-32 max-w-64">
-            <Button onClick={() => selectProjectDir(name)}>Select directory</Button>
+          <div className="w-full py-2 min-w-32 max-w-64">
+            <Button onClick={openSelectProjectDir} size={'xs'} title={`Select project directory for ${name}`}>
+              Select directory
+            </Button>
           </div>
         )}
 
@@ -148,12 +170,12 @@ export function ProjectsPage() {
         <LogsPopover />
 
         <div className="flex gap-2">
-          <Button onClick={() => GetProjects().then(setProjects)}>
-            <ArrowPathIcon width={24} height={24} className="m-1 text-current" />
+          <Button onClick={() => GetProjects().then(setProjects)} size={'icon-lg'} title="Refresh projects">
+            <ArrowPathIcon width={24} height={24} className="text-current" />
           </Button>
 
-          <Button onClick={() => setCurrentPage('AddProject')}>
-            <PlusIcon width={24} height={24} className="m-1 text-current" />
+          <Button onClick={() => setCurrentPage('AddProject')} size={'icon-lg'} variant={'success'} title="Add project">
+            <PlusIcon width={24} height={24} className="text-current" />
           </Button>
         </div>
       </div>
