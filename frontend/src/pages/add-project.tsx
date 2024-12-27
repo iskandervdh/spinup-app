@@ -6,7 +6,7 @@ import { useCommandsStore } from '~/stores/commandsStore';
 import { useProjectsStore } from '~/stores/projectsStore';
 import { GetCommands } from 'wjs/go/app/App';
 import { Button } from '~/components/button';
-import { usePageStore } from '~/stores/pageStore';
+import { Page, usePageStore } from '~/stores/pageStore';
 
 export function AddProjectPage() {
   const { commands, setCommands } = useCommandsStore();
@@ -24,7 +24,7 @@ export function AddProjectPage() {
 
       try {
         await addProject(name, domain, port, commandNames);
-        setCurrentPage('Projects');
+        setCurrentPage(Page.Projects);
       } catch (e) {
         // TODO: Show error toast
         console.error(e);
@@ -38,61 +38,65 @@ export function AddProjectPage() {
   }, []);
 
   return (
-    <form onSubmit={submit} className="flex flex-col gap-4">
-      <div>
+    <form onSubmit={submit} className="flex flex-col w-full max-w-2xl">
+      <div className="flex items-center pb-4 h-14">
         <PageTitle>Add Project</PageTitle>
       </div>
 
-      <div className="flex flex-col gap-2">
-        <label htmlFor="name" className="w-min">
-          Name
-        </label>
-        <Input id="name" name="name" type="text" value={name} onChange={(e) => setName(e.target.value)} />
-      </div>
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
+          <label htmlFor="name" className="w-min">
+            Name
+          </label>
+          <Input id="name" name="name" type="text" value={name} onChange={(e) => setName(e.target.value)} />
+        </div>
 
-      <div className="flex flex-col gap-2">
-        <label htmlFor="domain" className="w-min">
-          Domain
-        </label>
-        <Input id="domain" name="domain" type="text" value={domain} onChange={(e) => setDomain(e.target.value)} />
-      </div>
+        <div className="flex flex-col gap-2">
+          <label htmlFor="domain" className="w-min">
+            Domain
+          </label>
+          <Input id="domain" name="domain" type="text" value={domain} onChange={(e) => setDomain(e.target.value)} />
+        </div>
 
-      <div className="flex flex-col gap-2">
-        <label htmlFor="port" className="w-min">
-          Port
-        </label>
-        <Input
-          id="port"
-          name="port"
-          type="number"
-          min={1}
-          max={65536}
-          value={port}
-          onChange={(e) => setPort(parseInt(e.target.value))}
-        />
-      </div>
+        <div className="flex flex-col gap-2">
+          <label htmlFor="port" className="w-min">
+            Port
+          </label>
+          <Input
+            id="port"
+            name="port"
+            type="number"
+            min={1}
+            max={65536}
+            value={port}
+            onChange={(e) => setPort(parseInt(e.target.value))}
+          />
+        </div>
 
-      <div className="flex flex-col gap-2">
-        <label htmlFor="commands" className="w-min">
-          Commands
-        </label>
-        <Select
-          id="commands"
-          name="commands"
-          multiple
-          value={commandNames}
-          onChange={(e) => setCommandNames(Array.from(e.target.selectedOptions).map((o) => o.value))}
-        >
-          {commands &&
-            Object.keys(commands).map((name) => (
-              <option key={name} value={name}>
-                {name}
-              </option>
-            ))}
-        </Select>
-      </div>
+        <div className="flex flex-col gap-2">
+          <label htmlFor="commands" className="w-min">
+            Commands
+          </label>
+          <Select
+            id="commands"
+            name="commands"
+            multiple
+            value={commandNames}
+            onChange={(e) => setCommandNames(Array.from(e.target.selectedOptions).map((o) => o.value))}
+          >
+            {commands &&
+              Object.keys(commands).map((name) => (
+                <option key={name} value={name}>
+                  {name}
+                </option>
+              ))}
+          </Select>
+        </div>
 
-      <Button type="submit">Add Project</Button>
+        <Button type="submit" className="mt-2">
+          Add Project
+        </Button>
+      </div>
     </form>
   );
 }

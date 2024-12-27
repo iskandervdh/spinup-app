@@ -16,7 +16,7 @@ import { useProjectsStore } from '../stores/projectsStore';
 import { Project } from '~/types';
 import { BrowserOpenURL } from 'wjs/runtime/runtime';
 import { Button } from '~/components/button';
-import { usePageStore } from '~/stores/pageStore';
+import { Page, usePageStore } from '~/stores/pageStore';
 import { LogsPopover } from '~/components/logs-popover';
 
 function ProjectInfo({ name, project }: { name: string; project: Project }) {
@@ -174,7 +174,12 @@ export function ProjectsPage() {
             <ArrowPathIcon width={24} height={24} className="text-current" />
           </Button>
 
-          <Button onClick={() => setCurrentPage('AddProject')} size={'icon-lg'} variant={'success'} title="Add project">
+          <Button
+            onClick={() => setCurrentPage(Page.AddProject)}
+            size={'icon-lg'}
+            variant={'success'}
+            title="Add project"
+          >
             <PlusIcon width={24} height={24} className="text-current" />
           </Button>
         </div>

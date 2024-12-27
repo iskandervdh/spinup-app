@@ -1,5 +1,5 @@
 import logo from '../assets/images/icon.svg';
-import { NAV_PAGES, Page, PAGES, usePageStore } from '../stores/pageStore';
+import { defaultPage, NAV_PAGES, Page, usePageStore } from '../stores/pageStore';
 
 function NavbarItem({ page }: { page: Page }) {
   const { currentPage, setCurrentPage } = usePageStore();
@@ -28,7 +28,7 @@ export function Navbar() {
         alt="logo"
         className="w-12 h-12 cursor-pointer"
         draggable={false}
-        onClick={() => setCurrentPage(PAGES[0])}
+        onClick={() => setCurrentPage(defaultPage)}
       />
 
       <ul className="flex gap-8">

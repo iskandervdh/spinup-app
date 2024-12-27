@@ -10,6 +10,17 @@ import (
 )
 
 func (a *App) GetProjects() core.Projects {
+	err := a.core.GetCommandsConfig()
+	if err != nil {
+		fmt.Println("Error getting commands config:", err)
+	}
+
+	err = a.core.GetProjectsConfig()
+
+	if err != nil {
+		fmt.Println("Error getting projects config:", err)
+	}
+
 	projects, err := a.core.GetProjects()
 
 	if err != nil {
@@ -25,7 +36,13 @@ func (a *App) AddProject(name string, domain string, port int, commandNames []st
 	err := a.core.GetCommandsConfig()
 
 	if err != nil {
-		fmt.Println("Error getting commands config:", err)
+		return fmt.Errorf("error getting commands config: %s", err)
+	}
+
+	err = a.core.GetProjectsConfig()
+
+	if err != nil {
+		return fmt.Errorf("error getting projects config: %s", err)
 	}
 
 	msg := a.core.AddProject(name, domain, port, commandNames)
@@ -39,6 +56,18 @@ func (a *App) AddProject(name string, domain string, port int, commandNames []st
 }
 
 func (a *App) RemoveProject(name string) error {
+	err := a.core.GetCommandsConfig()
+
+	if err != nil {
+		return fmt.Errorf("error getting commands config: %s", err)
+	}
+
+	err = a.core.GetProjectsConfig()
+
+	if err != nil {
+		return fmt.Errorf("error getting projects config: %s", err)
+	}
+
 	msg := a.core.RemoveProject(name)
 
 	if _, ok := msg.(*common.ErrMsg); ok {

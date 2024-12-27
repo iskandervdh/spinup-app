@@ -14,7 +14,7 @@ export function SettingsPage() {
 
   return (
     <div>
-      <div className="pb-4">
+      <div className="flex items-center pb-4 h-14">
         <PageTitle>Settings</PageTitle>
       </div>
 
@@ -37,7 +37,7 @@ export function SettingsPage() {
         <div className="flex flex-col gap-2">
           <h2 className="text-xl font-bold text-primary">Info</h2>
 
-          <div className="grid max-w-6xl grid-cols-2">
+          <div className="grid max-w-6xl grid-cols-[16rem,auto]">
             <div>Spinup version</div>
             <div>{spinupVersion}</div>
 
