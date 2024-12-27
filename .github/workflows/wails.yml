@@ -5,6 +5,10 @@ on:
     tags:
       - '*'
 
+permissions:
+  contents: write
+  discussions: write
+
 env:
   NODE_OPTIONS: "--max-old-space-size=4096"
 
