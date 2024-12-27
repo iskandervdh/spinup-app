@@ -15,13 +15,13 @@ jobs:
       fail-fast: false
       matrix:
         build:
-          - name: 'Spinup'
+          - name: 'spinup-app'
             platform:  'linux/amd64'
             os: 'ubuntu-22.04'
-          # - name: 'Spinup'
+          # - name: 'spinup-app'
           #   platform:  'windows/amd64'
           #   os: 'windows-latest'
-          # - name: 'Spinup'
+          # - name: 'spinup-app'
           #   platform:  'darwin/universal'
           #   os: 'macos-latest'
 
@@ -43,6 +43,5 @@ jobs:
         with:
           build-name: ${{ matrix.build.name }}
           build-platform: ${{ matrix.build.platform }}
-          package: false
           go-version: '1.23'
           node-version: '22.x'
