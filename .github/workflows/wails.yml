@@ -21,7 +21,7 @@ jobs:
         build:
           - name: 'spinup-app'
             platform:  'linux/amd64'
-            os: 'ubuntu-22.04'
+            os: 'ubuntu-latest'
           # - name: 'spinup-app'
           #   platform:  'windows/amd64'
           #   os: 'windows-latest'
@@ -40,6 +40,10 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           version: 9
+
+      - name: Install webkitgtk-4.1
+        if: os.runner == 'Linux'
+        run: sudo apt-get update && sudo apt-get install libwebkit2gtk-4.1-dev
 
       - name: Build wails
         uses: dAppServer/wails-build-action@v2.2
