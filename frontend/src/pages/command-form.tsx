@@ -1,36 +1,60 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Input } from '~/components/input';
 import { PageTitle } from '~/components/page-title';
 import { useCommandsStore } from '~/stores/commandsStore';
 import { Button } from '~/components/button';
 import { Page, usePageStore } from '~/stores/pageStore';
 
-export function AddCommandPage() {
-  const { addCommand } = useCommandsStore();
+export function CommandFormPage() {
+  const { commands, commandFormSubmit, editingCommand, setEditingCommand } = useCommandsStore();
   const { setCurrentPage } = usePageStore();
 
   const [name, setName] = useState('');
   const [command, setCommand] = useState('');
+
+  const pageTitle = useMemo(
+    () => (editingCommand ? `Edit Command "${editingCommand}"` : 'Add Command'),
+    [editingCommand]
+  );
+
+  const submitText = useMemo(() => (editingCommand ? 'Save Command' : 'Add Command'), [editingCommand]);
 
   const submit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
 
       try {
-        await addCommand(name, command);
+        await commandFormSubmit(name, command);
         setCurrentPage(Page.Commands);
       } catch (e) {
         // TODO: Show error toast
         console.error(e);
       }
     },
-    [name, command, addCommand]
+    [name, command, commandFormSubmit]
   );
+
+  useEffect(() => {
+    return () => {
+      setEditingCommand(null);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (editingCommand) {
+      const command = commands?.[editingCommand];
+
+      if (command) {
+        setName(editingCommand);
+        setCommand(command);
+      }
+    }
+  }, [editingCommand, setName, setCommand]);
 
   return (
     <form onSubmit={submit} className="flex flex-col w-full max-w-2xl">
       <div className="flex items-center pb-4 h-14">
-        <PageTitle>Add Command</PageTitle>
+        <PageTitle>{pageTitle}</PageTitle>
       </div>
 
       <div className="flex flex-col gap-4">
@@ -49,7 +73,7 @@ export function AddCommandPage() {
         </div>
 
         <Button type="submit" className="mt-2">
-          Add Command
+          {submitText}
         </Button>
       </div>
     </form>

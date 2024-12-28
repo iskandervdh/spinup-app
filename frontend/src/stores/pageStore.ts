@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { create } from 'zustand';
-import { AddCommandPage } from '~/pages/add-command';
-import { AddProjectPage } from '~/pages/add-project';
+import { CommandFormPage } from '~/pages/command-form';
+import { ProjectFormPage } from '~/pages/project-form';
 import { CommandsPage } from '~/pages/commands';
 import { ProjectsPage } from '~/pages/projects';
 import { SettingsPage } from '~/pages/settings';
@@ -10,14 +10,13 @@ export enum Page {
   Projects = 'Projects',
   Commands = 'Commands',
   Settings = 'Settings',
-  AddProject = 'AddProject',
-  AddCommand = 'AddCommand',
+  ProjectForm = 'ProjectForm',
+  CommandForm = 'CommandForm',
 }
 
-export const defaultPage = Page.Projects;
+export const DEFAULT_PAGE = Page.Projects;
 
 export const NAV_PAGES = [Page.Projects, Page.Commands, Page.Settings] as const;
-export const PAGES = [...NAV_PAGES, Page.AddProject, Page.AddCommand] as const;
 
 interface PageState {
   currentPage: Page;
@@ -25,8 +24,8 @@ interface PageState {
   getPageComponent: (currentPage: Page) => () => JSX.Element;
 }
 
-export const usePageStore = create<PageState>((set, get) => ({
-  currentPage: defaultPage,
+export const usePageStore = create<PageState>((set) => ({
+  currentPage: DEFAULT_PAGE,
   setCurrentPage: (page) => set(() => ({ currentPage: page })),
   getPageComponent: (currentPage) => {
     switch (currentPage) {
@@ -36,10 +35,10 @@ export const usePageStore = create<PageState>((set, get) => ({
         return CommandsPage;
       case Page.Settings:
         return SettingsPage;
-      case Page.AddProject:
-        return AddProjectPage;
-      case Page.AddCommand:
-        return AddCommandPage;
+      case Page.ProjectForm:
+        return ProjectFormPage;
+      case Page.CommandForm:
+        return CommandFormPage;
     }
   },
 }));

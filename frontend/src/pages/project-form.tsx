@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Input } from '~/components/input';
 import { PageTitle } from '~/components/page-title';
 import { Select } from '~/components/select';
@@ -8,9 +8,9 @@ import { GetCommands } from 'wjs/go/app/App';
 import { Button } from '~/components/button';
 import { Page, usePageStore } from '~/stores/pageStore';
 
-export function AddProjectPage() {
+export function ProjectFormPage() {
   const { commands, setCommands } = useCommandsStore();
-  const { addProject } = useProjectsStore();
+  const { projects, projectFormSubmit, editingProject, setEditingProject } = useProjectsStore();
   const { setCurrentPage } = usePageStore();
 
   const [name, setName] = useState('');
@@ -18,29 +18,53 @@ export function AddProjectPage() {
   const [port, setPort] = useState(3000);
   const [commandNames, setCommandNames] = useState<string[]>([]);
 
+  const pageTitle = useMemo(
+    () => (editingProject ? `Edit Project "${editingProject}"` : 'Add Project'),
+    [editingProject]
+  );
+
+  const submitText = useMemo(() => (editingProject ? 'Save Project' : 'Add Project'), [editingProject]);
+
   const submit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
 
       try {
-        await addProject(name, domain, port, commandNames);
+        await projectFormSubmit(name, domain, port, commandNames);
         setCurrentPage(Page.Projects);
       } catch (e) {
         // TODO: Show error toast
         console.error(e);
       }
     },
-    [name, domain, port, commandNames, addProject]
+    [name, domain, port, commandNames, projectFormSubmit]
   );
 
   useEffect(() => {
     GetCommands().then(setCommands);
+
+    return () => {
+      setEditingProject(null);
+    };
   }, []);
+
+  useEffect(() => {
+    if (editingProject) {
+      const project = projects?.[editingProject];
+
+      if (project) {
+        setName(editingProject);
+        setDomain(project.domain);
+        setPort(project.port);
+        setCommandNames(project.commands);
+      }
+    }
+  }, [editingProject, setName, setDomain, setPort, setCommandNames]);
 
   return (
     <form onSubmit={submit} className="flex flex-col w-full max-w-2xl">
       <div className="flex items-center pb-4 h-14">
-        <PageTitle>Add Project</PageTitle>
+        <PageTitle>{pageTitle}</PageTitle>
       </div>
 
       <div className="flex flex-col gap-4">
@@ -94,7 +118,7 @@ export function AddProjectPage() {
         </div>
 
         <Button type="submit" className="mt-2">
-          Add Project
+          {submitText}
         </Button>
       </div>
     </form>

@@ -20,8 +20,16 @@ import { Page, usePageStore } from '~/stores/pageStore';
 import { LogsPopover } from '~/components/logs-popover';
 
 function ProjectInfo({ name, project }: { name: string; project: Project }) {
-  const { runningProjects, runProject, stopProject, selectProjectDir, removeProject, setCurrentProject } =
-    useProjectsStore();
+  const {
+    runningProjects,
+    runProject,
+    stopProject,
+    selectProjectDir,
+    removeProject,
+    setCurrentProject,
+    setEditingProject,
+  } = useProjectsStore();
+  const { setCurrentPage } = usePageStore();
 
   const isRunning = useMemo(() => runningProjects.includes(name), [runningProjects]);
   const commands = useMemo(() => project.commands.join(', '), [project.commands]);
@@ -63,6 +71,11 @@ function ProjectInfo({ name, project }: { name: string; project: Project }) {
     }
   }, [name, isRunning]);
 
+  const edit = useCallback(() => {
+    setEditingProject(name);
+    setCurrentPage(Page.ProjectForm);
+  }, [name, setEditingProject, setCurrentPage]);
+
   const remove = useCallback(() => {
     if (confirm(`Are you sure you want to remove project "${name}"?`)) {
       removeProject(name);
@@ -92,6 +105,10 @@ function ProjectInfo({ name, project }: { name: string; project: Project }) {
 
         <div className="flex items-center gap-2">
           <h3 className="pr-2 text-xl font-bold text-primary">{name}</h3>
+
+          <Button onClick={edit} size={'xs'} title={`Change project directory for ${name}`}>
+            <PencilSquareIcon width={16} height={16} className="text-current" />
+          </Button>
 
           {isRunning ? (
             <Button onClick={showLogs} size={'icon'} variant={'info'} title={`Show logs for project ${name}`}>
@@ -175,7 +192,7 @@ export function ProjectsPage() {
           </Button>
 
           <Button
-            onClick={() => setCurrentPage(Page.AddProject)}
+            onClick={() => setCurrentPage(Page.ProjectForm)}
             size={'icon-lg'}
             variant={'success'}
             title="Add project"

@@ -13,20 +13,26 @@ interface ProjectsState {
   projects: Projects | null;
   setProjects: (projects: Projects) => void;
 
+  editingProject: string | null;
+  setEditingProject: (projectName: string | null) => void;
+
   runningProjects: string[];
   runProject: (projectName: string) => Promise<void>;
   stopProject: (projectName: string) => Promise<void>;
   selectProjectDir: (projectName: string, defaultDir: string | null) => Promise<void>;
-  addProject: (projectName: string, domain: string, port: number, commandNames: string[]) => Promise<void>;
+  projectFormSubmit: (projectName: string, domain: string, port: number, commandNames: string[]) => Promise<void>;
   removeProject: (projectName: string) => Promise<void>;
 
   currentProject: string | null;
   setCurrentProject: (projectName: string | null) => void;
 }
 
-export const useProjectsStore = create<ProjectsState>((set) => ({
+export const useProjectsStore = create<ProjectsState>((set, get) => ({
   projects: null,
   setProjects: (projects) => set(() => ({ projects })),
+
+  editingProject: null,
+  setEditingProject: (projectName) => set(() => ({ editingProject: projectName })),
 
   runningProjects: [],
   async runProject(projectName) {
@@ -45,8 +51,13 @@ export const useProjectsStore = create<ProjectsState>((set) => ({
     const projects = await GetProjects();
     set(() => ({ projects }));
   },
-  async addProject(projectName, domain, port, commandNames) {
-    await AddProject(projectName, domain, port, commandNames);
+  async projectFormSubmit(projectName, domain, port, commandNames) {
+    if (get().editingProject === projectName) {
+      await AddProject(projectName, domain, port, commandNames);
+      set(() => ({ editingProject: null }));
+    } else {
+      await AddProject(projectName, domain, port, commandNames);
+    }
 
     const projects = await GetProjects();
     set(() => ({ projects }));

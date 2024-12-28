@@ -55,6 +55,29 @@ func (a *App) AddProject(name string, domain string, port int, commandNames []st
 	return nil
 }
 
+func (a *App) UpdateProject(name string, domain string, port int, commandNames []string) error {
+	err := a.core.GetCommandsConfig()
+
+	if err != nil {
+		return fmt.Errorf("error getting commands config: %s", err)
+	}
+
+	err = a.core.GetProjectsConfig()
+
+	if err != nil {
+		return fmt.Errorf("error getting projects config: %s", err)
+	}
+
+	msg := a.core.UpdateProject(name, domain, port, commandNames)
+
+	if _, ok := msg.(*common.ErrMsg); ok {
+		fmt.Println(msg.GetText())
+		return fmt.Errorf("%s", msg.GetText())
+	}
+
+	return nil
+}
+
 func (a *App) RemoveProject(name string) error {
 	err := a.core.GetCommandsConfig()
 

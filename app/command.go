@@ -36,6 +36,23 @@ func (a *App) AddCommand(name string, command string) error {
 	return nil
 }
 
+func (a *App) UpdateCommand(name string, command string) error {
+	err := a.core.GetCommandsConfig()
+
+	if err != nil {
+		return fmt.Errorf("error getting commands config: %s", err)
+	}
+
+	msg := a.core.UpdateCommand(name, command)
+
+	if _, ok := msg.(*common.ErrMsg); ok {
+		fmt.Println(msg.GetText())
+		return fmt.Errorf("%s", msg.GetText())
+	}
+
+	return nil
+}
+
 func (a *App) RemoveCommand(name string) error {
 	err := a.core.GetCommandsConfig()
 
