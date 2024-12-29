@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { usePageStore } from '~/stores/pageStore';
 import { Navbar } from '~/sections/navbar';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   const { currentPage, getPageComponent } = usePageStore();
@@ -18,6 +19,8 @@ function App() {
   return (
     <div id="App" className="flex flex-col h-screen text-white bg-background font-azeret">
       <Navbar />
+
+      <Toaster position="bottom-right" reverseOrder={false} />
 
       <div className="p-4 overflow-scroll" ref={contentContainerRef}>
         <CurrentPage />

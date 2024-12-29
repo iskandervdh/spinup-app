@@ -18,6 +18,7 @@ import { Button } from '~/components/button';
 import { Page, usePageStore } from '~/stores/pageStore';
 import { LogsPopover } from '~/sections/logs-popover';
 import { core } from 'wjs/go/models';
+import toast from 'react-hot-toast';
 
 function ProjectInfo({ name, project }: { name: string; project: core.Project }) {
   const {
@@ -76,11 +77,13 @@ function ProjectInfo({ name, project }: { name: string; project: core.Project })
     setCurrentPage(Page.ProjectForm);
   }, [name, setEditingProject, setCurrentPage]);
 
-  const remove = useCallback(() => {
+  const remove = useCallback(async () => {
     if (confirm(`Are you sure you want to remove project "${name}"?`)) {
-      removeProject(name);
+      await removeProject(name);
+
+      toast.success(<b>Removed project "${name}"</b>);
     }
-  }, [name]);
+  }, [name, removeProject]);
 
   return (
     <div>

@@ -10,7 +10,10 @@ interface SelectMultipleProps extends DetailedHTMLProps<SelectHTMLAttributes<HTM
 
 export function SelectMultiple({ options, value, onChanged, className, ...props }: SelectMultipleProps) {
   return (
-    <div {...props} className={cn('flex flex-col flex-wrap gap-2', className)}>
+    <div
+      {...props}
+      className={cn('flex flex-col gap-2 max-h-36 border border-primary rounded-lg px-3 py-2 overflow-auto', className)}
+    >
       {options.map((name) => (
         <div key={name} className="flex items-center gap-2">
           <Checkbox
