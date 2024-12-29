@@ -5,6 +5,7 @@ import { useCommandsStore } from '~/stores/commandsStore';
 import { Button } from '~/components/button';
 import { ArrowPathIcon, PencilSquareIcon, PlusIcon, TrashIcon } from '@heroicons/react/20/solid';
 import { Page, usePageStore } from '~/stores/pageStore';
+import toast from 'react-hot-toast';
 
 function CommandInfo({ name, command }: { name: string; command: string }) {
   const { setCurrentPage } = usePageStore();
@@ -15,9 +16,11 @@ function CommandInfo({ name, command }: { name: string; command: string }) {
     setCurrentPage(Page.CommandForm);
   }, [name, setEditingCommand, setCurrentPage]);
 
-  const remove = useCallback(() => {
+  const remove = useCallback(async () => {
     if (confirm(`Are you sure you want to remove command "${name}"?`)) {
-      removeCommand(name);
+      await removeCommand(name);
+
+      toast.success(<b>Removed command "{name}"</b>);
     }
   }, [name, removeCommand]);
 

@@ -4,6 +4,7 @@ import { PageTitle } from '~/components/page-title';
 import { useCommandsStore } from '~/stores/commandsStore';
 import { Button } from '~/components/button';
 import { Page, usePageStore } from '~/stores/pageStore';
+import toast from 'react-hot-toast';
 
 export function CommandFormPage() {
   const { commands, commandFormSubmit, editingCommand, setEditingCommand } = useCommandsStore();
@@ -23,15 +24,30 @@ export function CommandFormPage() {
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
 
-      try {
-        await commandFormSubmit(name, command);
-        setCurrentPage(Page.Commands);
-      } catch (e) {
-        // TODO: Show error toast
-        console.error(e);
-      }
+      await toast
+        .promise(commandFormSubmit(name, command), {
+          loading: editingCommand ? 'Saving command...' : 'Creating command...',
+          success: editingCommand ? <b>Command saved</b> : <b>Command created</b>,
+          error: (err) =>
+            editingCommand ? (
+              <b>
+                Failed to save command:
+                <br />
+                {err}
+              </b>
+            ) : (
+              <b>
+                Failed to create command:
+                <br />
+                {err}
+              </b>
+            ),
+        })
+        .then(() => {
+          setCurrentPage(Page.Commands);
+        });
     },
-    [name, command, commandFormSubmit]
+    [name, command, editingCommand, commandFormSubmit]
   );
 
   useEffect(() => {
