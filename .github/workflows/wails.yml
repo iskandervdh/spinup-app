@@ -103,9 +103,23 @@ jobs:
       #   run: chmod +x build/bin/*/Contents/MacOS/*
       #   shell: bash
       - name: Add Linux perms
-        if: runner.os  == 'Linux'
+        if: runner.os == 'Linux'
         working-directory: ${{ env.WORKING_DIRECTORY }}
         run: chmod +x build/bin/*
+        shell: bash
+
+      # Package as .deb for Ubuntu
+      - name: Package as .deb
+        if: runner.os == 'Linux'
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        env:
+          VERSION: ${{ github.ref }}
+        run: |
+          mkdir -p deb/spinup-app/DEBIAN &&
+          mkdir -p deb/spinup-app/usr/local/bin &&
+          cp build/bin/spinup-app deb/spinup-app/usr/local/bin/spinup-app &&
+          echo "Package: spinup-app\nVersion: ${$VERSION/v/""}\nSection: base\nPriority: optional\nArchitecture: amd64\nDepends: libgtk-3-0, libwebkit2gtk-4.1-dev\nMaintainer: iskandervdh\nDescription: spinup-app\n" > deb/spinup-app/DEBIAN/control &&
+          dpkg-deb --build deb/spinup-app
         shell: bash
 
       # Upload build assets
@@ -115,9 +129,11 @@ jobs:
           path: |
             */bin/
             *\bin\*
+            deb/spinup-app.deb
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
             */bin/*
+            deb/spinup-app.deb
