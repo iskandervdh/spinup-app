@@ -83,13 +83,13 @@ function ProjectInfo({ name, project }: { name: string; project: core.Project })
   }, [name]);
 
   return (
-    <div key={name}>
+    <div>
       <div className="flex items-center gap-2 mb-2">
         {canRunProject ? (
           <button
             className="p-2 rounded-lg hover:bg-black/10"
             onClick={startOrStopProject}
-            title={isRunning ? `Stop project ${name}` : `Start project ${name}`}
+            title={isRunning ? 'Stop project' : 'Start project'}
           >
             {isRunning ? (
               <StopIcon width={20} height={20} className="text-red-400" />
@@ -106,16 +106,16 @@ function ProjectInfo({ name, project }: { name: string; project: core.Project })
         <div className="flex items-center gap-2">
           <h3 className="pr-2 text-xl font-bold text-primary">{name}</h3>
 
-          <Button onClick={edit} size={'xs'} title={`Edit project ${name}`}>
+          <Button onClick={edit} size={'xs'} title="Edit project">
             <PencilSquareIcon width={16} height={16} className="text-current" />
           </Button>
 
           {isRunning ? (
-            <Button onClick={showLogs} size={'icon'} variant={'info'} title={`Show logs for project ${name}`}>
+            <Button onClick={showLogs} size={'icon'} variant={'info'} title="Show logs">
               <DocumentTextIcon width={16} height={16} className="text-current" />
             </Button>
           ) : (
-            <Button onClick={remove} size={'icon'} variant={'error'} title={`Remove project ${name}`}>
+            <Button onClick={remove} size={'icon'} variant={'error'} title="Remove project">
               <TrashIcon width={16} height={16} className="text-current" />
             </Button>
           )}
@@ -145,17 +145,17 @@ function ProjectInfo({ name, project }: { name: string; project: core.Project })
         <div>Directory</div>
         {project.dir ? (
           <div className="flex items-center gap-2 py-1">
-            <Button onClick={openProjectDir} size={'xs'} title={`Open project directory for ${name}`}>
+            <Button onClick={openProjectDir} size={'xs'} title="Open project directory">
               <FolderIcon width={16} height={16} className="text-current" />
             </Button>
 
-            <Button onClick={openSelectProjectDir} size={'xs'} title={`Change project directory for ${name}`}>
+            <Button onClick={openSelectProjectDir} size={'xs'} title="Change project directory">
               <PencilSquareIcon width={16} height={16} className="text-current" />
             </Button>
           </div>
         ) : (
           <div className="w-full py-2 min-w-32 max-w-64">
-            <Button onClick={openSelectProjectDir} size={'xs'} title={`Select project directory for ${name}`}>
+            <Button onClick={openSelectProjectDir} size={'xs'} title="Select project directory">
               Select directory
             </Button>
           </div>

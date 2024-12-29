@@ -26,11 +26,11 @@ function CommandInfo({ name, command }: { name: string; command: string }) {
       <div className="flex items-center gap-2">
         <h3 className="pr-2 text-xl font-bold text-primary">{name}</h3>
 
-        <Button onClick={edit} size={'xs'} title={`Change project directory for ${name}`}>
+        <Button onClick={edit} size={'xs'} title="Edit command">
           <PencilSquareIcon width={16} height={16} className="text-current" />
         </Button>
 
-        <Button onClick={remove} size={'icon'} variant={'error'} title={`Remove project ${name}`}>
+        <Button onClick={remove} size={'icon'} variant={'error'} title="Remove command">
           <TrashIcon width={16} height={16} className="text-current" />
         </Button>
       </div>
@@ -57,7 +57,7 @@ export function CommandsPage() {
         <PageTitle>Commands</PageTitle>
 
         <div className="flex gap-2">
-          <Button onClick={() => GetCommands().then(setCommands)} size={'icon-lg'} title="Refresh projects">
+          <Button onClick={() => GetCommands().then(setCommands)} size={'icon-lg'} title="Refresh commands">
             <ArrowPathIcon width={24} height={24} className="text-current" />
           </Button>
 
