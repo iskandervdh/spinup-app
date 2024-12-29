@@ -13,13 +13,13 @@ import { GetProjects } from '../../wailsjs/go/app/App';
 import { useCallback, useEffect, useMemo } from 'react';
 import { PageTitle } from '../components/page-title';
 import { useProjectsStore } from '../stores/projectsStore';
-import { Project } from '~/types';
 import { BrowserOpenURL } from 'wjs/runtime/runtime';
 import { Button } from '~/components/button';
 import { Page, usePageStore } from '~/stores/pageStore';
 import { LogsPopover } from '~/sections/logs-popover';
+import { core } from 'wjs/go/models';
 
-function ProjectInfo({ name, project }: { name: string; project: Project }) {
+function ProjectInfo({ name, project }: { name: string; project: core.Project }) {
   const {
     runningProjects,
     runProject,

@@ -4,10 +4,9 @@ import (
 	"fmt"
 
 	"github.com/iskandervdh/spinup/common"
-	"github.com/iskandervdh/spinup/core"
 )
 
-func (a *App) GetCommands() core.Commands {
+func (a *App) GetCommands() map[string]string {
 	commands, err := a.core.GetCommands()
 
 	if err != nil {

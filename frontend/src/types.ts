@@ -1,12 +1,5 @@
-export type Project = {
-  domain: string;
-  port: number;
-  commands: string[];
-  dir: string | null;
-  variables: Record<string, unknown>;
-  domainAliases: string[];
-};
+import { GetCommands, GetProjects } from 'wjs/go/app/App';
 
-export type Projects = Record<string, Project>;
+export type Projects = Awaited<ReturnType<typeof GetProjects>>;
 
-export type Commands = Record<string, string>;
+export type Commands = Awaited<ReturnType<typeof GetCommands>>;

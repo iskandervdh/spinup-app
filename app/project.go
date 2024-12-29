@@ -9,7 +9,7 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-func (a *App) GetProjects() core.Projects {
+func (a *App) GetProjects() map[string]core.Project {
 	err := a.core.GetCommandsConfig()
 	if err != nil {
 		fmt.Println("Error getting commands config:", err)

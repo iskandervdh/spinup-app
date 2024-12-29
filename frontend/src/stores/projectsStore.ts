@@ -20,7 +20,7 @@ interface ProjectsState {
   runningProjects: string[];
   runProject: (projectName: string) => Promise<void>;
   stopProject: (projectName: string) => Promise<void>;
-  selectProjectDir: (projectName: string, defaultDir: string | null) => Promise<void>;
+  selectProjectDir: (projectName: string, defaultDir: string | undefined) => Promise<void>;
   projectFormSubmit: (projectName: string, domain: string, port: number, commandNames: string[]) => Promise<void>;
   removeProject: (projectName: string) => Promise<void>;
 
