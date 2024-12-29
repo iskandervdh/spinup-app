@@ -25,7 +25,7 @@ jobs:
         build:
           - name: 'spinup-app'
             platform:  'linux/amd64'
-            os: 'ubuntu-latest'
+            os: 'ubuntu-22.04'
           # - name: 'spinup-app'
           #   platform:  'windows/amd64'
           #   os: 'windows-latest'
@@ -52,42 +52,50 @@ jobs:
         with:
           check-latest: true
           go-version: '1.23'
+          cache-dependency-path: 'go.sum'
       - run: go version
         shell: bash
+
       # Setup pnpm
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        working-directory: ${{ env.WORKING_DIRECTORY }}/frontend
         with:
           version: 9
+          run_install: false
+
       # Setup and configure NodeJS
       - name: Setup NodeJS
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: 'pnpm'
+          cache-dependency-path: './frontend/pnpm-lock.yaml'
+
       # install wails
       - name: Install Wails
         run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
         shell: bash
       - name: Install Ubuntu Wails deps
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install libgtk-3-0 libwebkit2gtk-4.1-dev gcc-aarch64-linux-gnu
+        run: sudo apt-get update && sudo apt-get install -y libgtk-3-0 libwebkit2gtk-4.0-dev libwebkit2gtk-4.1-dev gcc-aarch64-linux-gnu
         shell: bash
-      - name: Install macOS Wails deps
-        if: runner.os == 'macOS'
-        run: brew install mitchellh/gon/gon
-        shell: bash
+      # - name: Install macOS Wails deps
+      #   if: runner.os == 'macOS'
+      #   run: brew install mitchellh/gon/gon
+      #   shell: bash
+
       # Building step
-      - name: Build macOs App
-        if: runner.os == 'macOS'
-        working-directory: ${{ env.WORKING_DIRECTORY }}
-        run: wails build --platform ${{ matrix.build.platform }} -webview2 ${{ env.WEBVIEW2 }} -o ${{ matrix.build.name }}
-        shell: bash
+      # - name: Build macOs App
+      #   if: runner.os == 'macOS'
+      #   working-directory: ${{ env.WORKING_DIRECTORY }}
+      #   run: wails build --platform ${{ matrix.build.platform }} -webview2 ${{ env.WEBVIEW2 }} -o ${{ matrix.build.name }}
+      #   shell: bash
       - name: Build Linux App
         if: runner.os == 'Linux'
         working-directory: ${{ env.WORKING_DIRECTORY }}
-        run: wails build --platform ${{ matrix.build.platform }} -webview2 ${{ env.WEBVIEW2 }} -o ${{ matrix.build.name }} -tags webkit2_41
+        run: |
+          wails build --platform ${{ matrix.build.platform }} -webview2 ${{ env.WEBVIEW2 }} -o ${{ matrix.build.name }}-webkit2-40 -tags webkit2_40
+          wails build --platform ${{ matrix.build.platform }} -webview2 ${{ env.WEBVIEW2 }} -o ${{ matrix.build.name }}-webkit2-41 -tags webkit2_41
         shell: bash
       # - name: Build Windows App
       #   if: runner.os == 'Windows' && inputs.nsis == 'false'
@@ -99,6 +107,8 @@ jobs:
       #   working-directory: ${{ env.WORKING_DIRECTORY }}
       #   run: wails build --platform ${{ matrix.build.platform }} -webview2 ${{ env.WEBVIEW2 }} -nsis -o ${{ matrix.build.name }}
       #   shell: bash
+
+      # Add permissions to the binary
       # - name: Add macOS perms
       #   if: runner.os == 'macOS'
       #   working-directory: ${{ env.WORKING_DIRECTORY }}
@@ -111,26 +121,27 @@ jobs:
         shell: bash
 
       # Package as .deb for Ubuntu
-      - name: Package as .deb
+      - name: Package as .deb for Ubuntu
         if: runner.os == 'Linux'
         working-directory: ${{ env.WORKING_DIRECTORY }}
-        env:
-          VERSION: ${{ github.ref }}
         run: |
-          mkdir -p deb/spinup-app/DEBIAN
-          mkdir -p deb/spinup-app/usr/local/bin &&
-          cp build/bin/spinup-app deb/spinup-app/usr/local/bin/spinup-app &&
+          for version in 40 41; do
+            mkdir -p deb/spinup-app-webkit2-${version}/DEBIAN
+            mkdir -p deb/spinup-app-webkit2-${version}/usr/share/spinup/bin
+            cp build/bin/spinup-app-webkit2-${version} deb/spinup-app-webkit2-${version}/usr/share/spinup/bin/spinup-app
+            cp build/DEBIAN/* deb/spinup-app-webkit2-${version}/DEBIAN/*
 
-          echo "Package: spinup-app" > deb/spinup-app/DEBIAN/control
-          echo "Version: ${VERSION/v/""}" >> deb/spinup-app/DEBIAN/control
-          echo "Section: base" >> deb/spinup-app/DEBIAN/control
-          echo "Priority: optional" >> deb/spinup-app/DEBIAN/control
-          echo "Architecture: amd64" >> deb/spinup-app/DEBIAN/control
-          echo "Depends: libgtk-3-0, libwebkit2gtk-4.1-dev" >> deb/spinup-app/DEBIAN/control
-          echo "Maintainer: iskandervdh" >> deb/spinup-app/DEBIAN/control
-          echo "Description: Quickly spin up your multi command projects." >> deb/spinup-app/DEBIAN/control
+            SPINUP_APP_VERSION=$(cat ./app/.version)
+            echo -e "\nVersion: ${SPINUP_APP_VERSION/v/""}" >> deb/spinup-app-webkit2-${version}/DEBIAN/control
 
-          dpkg-deb --build deb/spinup-app
+            if [ "$version" -eq "40" ]; then
+              echo "Depends: libgtk-3-0, libwebkit2gtk-4.0-dev" >> deb/spinup-app-webkit2-${version}/DEBIAN/control
+            else
+              echo "Depends: libgtk-3-0, libwebkit2gtk-4.1-dev" >> deb/spinup-app-webkit2-${version}/DEBIAN/control
+            fi
+
+            dpkg-deb --build deb/spinup-app-webkit2-${version}
+          done
         shell: bash
 
       # Upload build assets
@@ -140,11 +151,11 @@ jobs:
           path: |
             */bin/
             *\bin\*
-            deb/spinup-app.deb
+            */deb/spinup-app-*.deb
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
             */bin/*
-            deb/spinup-app.deb
+            */deb/spinup-app-*.deb
