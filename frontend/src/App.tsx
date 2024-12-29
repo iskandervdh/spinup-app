@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { usePageStore } from '~/stores/pageStore';
-import { Navbar } from '~/components/navbar';
+import { Navbar } from '~/sections/navbar';
 
 function App() {
   const { currentPage, getPageComponent } = usePageStore();

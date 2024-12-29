@@ -39,10 +39,13 @@ export function CommandsPage() {
           </Button>
 
           <Button
-            onClick={() => setCurrentPage(Page.CommandForm)}
+            onClick={() => {
+              setEditingCommand(null);
+              setCurrentPage(Page.CommandForm);
+            }}
             size={'icon-lg'}
             variant={'success'}
-            title="Add project"
+            title="Add command"
           >
             <PlusIcon width={24} height={24} className="text-current" />
           </Button>

@@ -35,12 +35,6 @@ export function CommandFormPage() {
   );
 
   useEffect(() => {
-    return () => {
-      setEditingCommand(null);
-    };
-  }, []);
-
-  useEffect(() => {
     if (editingCommand) {
       const command = commands?.[editingCommand];
 

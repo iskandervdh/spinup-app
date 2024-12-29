@@ -7,6 +7,7 @@ import { useProjectsStore } from '~/stores/projectsStore';
 import { GetCommands } from 'wjs/go/app/App';
 import { Button } from '~/components/button';
 import { Page, usePageStore } from '~/stores/pageStore';
+import { SelectMultiple } from '~/components/select-multiple';
 
 export function ProjectFormPage() {
   const { commands, setCommands } = useCommandsStore();
@@ -42,10 +43,6 @@ export function ProjectFormPage() {
 
   useEffect(() => {
     GetCommands().then(setCommands);
-
-    return () => {
-      setEditingProject(null);
-    };
   }, []);
 
   useEffect(() => {
@@ -98,23 +95,14 @@ export function ProjectFormPage() {
         </div>
 
         <div className="flex flex-col gap-2">
-          <label htmlFor="commands" className="w-min">
-            Commands
-          </label>
-          <Select
+          <label className="w-min">Commands</label>
+          <SelectMultiple
             id="commands"
             name="commands"
-            multiple
+            options={commands ? Object.keys(commands) : []}
             value={commandNames}
-            onChange={(e) => setCommandNames(Array.from(e.target.selectedOptions).map((o) => o.value))}
-          >
-            {commands &&
-              Object.keys(commands).map((name) => (
-                <option key={name} value={name}>
-                  {name}
-                </option>
-              ))}
-          </Select>
+            onChanged={setCommandNames}
+          />
         </div>
 
         <Button type="submit" className="mt-2">

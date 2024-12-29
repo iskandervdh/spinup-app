@@ -17,7 +17,7 @@ import { Project } from '~/types';
 import { BrowserOpenURL } from 'wjs/runtime/runtime';
 import { Button } from '~/components/button';
 import { Page, usePageStore } from '~/stores/pageStore';
-import { LogsPopover } from '~/components/logs-popover';
+import { LogsPopover } from '~/sections/logs-popover';
 
 function ProjectInfo({ name, project }: { name: string; project: Project }) {
   const {
@@ -106,7 +106,7 @@ function ProjectInfo({ name, project }: { name: string; project: Project }) {
         <div className="flex items-center gap-2">
           <h3 className="pr-2 text-xl font-bold text-primary">{name}</h3>
 
-          <Button onClick={edit} size={'xs'} title={`Change project directory for ${name}`}>
+          <Button onClick={edit} size={'xs'} title={`Edit project ${name}`}>
             <PencilSquareIcon width={16} height={16} className="text-current" />
           </Button>
 
@@ -173,7 +173,7 @@ function ProjectInfo({ name, project }: { name: string; project: Project }) {
 
 export function ProjectsPage() {
   const { setCurrentPage } = usePageStore();
-  const { projects, setProjects } = useProjectsStore();
+  const { projects, setProjects, setEditingProject } = useProjectsStore();
 
   useEffect(() => {
     GetProjects().then(setProjects);
@@ -192,7 +192,10 @@ export function ProjectsPage() {
           </Button>
 
           <Button
-            onClick={() => setCurrentPage(Page.ProjectForm)}
+            onClick={() => {
+              setEditingProject(null);
+              setCurrentPage(Page.ProjectForm);
+            }}
             size={'icon-lg'}
             variant={'success'}
             title="Add project"

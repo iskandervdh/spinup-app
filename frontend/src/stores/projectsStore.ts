@@ -7,6 +7,7 @@ import {
   StopProject,
   AddProject,
   RemoveProject,
+  UpdateProject,
 } from 'wjs/go/app/App';
 
 interface ProjectsState {
@@ -53,7 +54,7 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
   },
   async projectFormSubmit(projectName, domain, port, commandNames) {
     if (get().editingProject === projectName) {
-      await AddProject(projectName, domain, port, commandNames);
+      await UpdateProject(projectName, domain, port, commandNames);
       set(() => ({ editingProject: null }));
     } else {
       await AddProject(projectName, domain, port, commandNames);
