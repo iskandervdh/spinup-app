@@ -136,7 +136,7 @@ jobs:
             mkdir -p deb/spinup-app-webkit2-${version}/usr/share/spinup/bin
             cp build/bin/spinup-app-webkit2-${version} deb/spinup-app-webkit2-${version}/usr/share/spinup/bin/spinup-app
             cp build/DEBIAN/* deb/spinup-app-webkit2-${version}/DEBIAN
-            cp -r build/share/* deb/spinup-app-webkit2-${version}/share
+            cp -r build/share deb/spinup-app-webkit2-${version}
 
             SPINUP_APP_VERSION=$(cat ./app/.version)
             echo -e "\nVersion: ${SPINUP_APP_VERSION/v/""}" >> deb/spinup-app-webkit2-${version}/DEBIAN/control
