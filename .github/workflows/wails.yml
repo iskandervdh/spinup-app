@@ -54,16 +54,18 @@ jobs:
           go-version: '1.23'
       - run: go version
         shell: bash
-      # Setup and configure NodeJS
-      - name: Setup NodeJS
-        uses: actions/setup-node@v3
-        with:
-          node-version: '22.x'
-      # (Optional) Setup pnpm
+      # Setup pnpm
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
+        working-directory: ${{ env.WORKING_DIRECTORY }}/frontend
         with:
           version: 9
+      # Setup and configure NodeJS
+      - name: Setup NodeJS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
       # install wails
       - name: Install Wails
         run: go install github.com/wailsapp/wails/v2/cmd/wails@latest
@@ -115,10 +117,19 @@ jobs:
         env:
           VERSION: ${{ github.ref }}
         run: |
-          mkdir -p deb/spinup-app/DEBIAN &&
+          mkdir -p deb/spinup-app/DEBIAN
           mkdir -p deb/spinup-app/usr/local/bin &&
           cp build/bin/spinup-app deb/spinup-app/usr/local/bin/spinup-app &&
-          echo "Package: spinup-app\nVersion: ${$VERSION/v/""}\nSection: base\nPriority: optional\nArchitecture: amd64\nDepends: libgtk-3-0, libwebkit2gtk-4.1-dev\nMaintainer: iskandervdh\nDescription: spinup-app\n" > deb/spinup-app/DEBIAN/control &&
+
+          echo "Package: spinup-app" > deb/spinup-app/DEBIAN/control
+          echo "Version: ${VERSION/v/""}" >> deb/spinup-app/DEBIAN/control
+          echo "Section: base" >> deb/spinup-app/DEBIAN/control
+          echo "Priority: optional" >> deb/spinup-app/DEBIAN/control
+          echo "Architecture: amd64" >> deb/spinup-app/DEBIAN/control
+          echo "Depends: libgtk-3-0, libwebkit2gtk-4.1-dev" >> deb/spinup-app/DEBIAN/control
+          echo "Maintainer: iskandervdh" >> deb/spinup-app/DEBIAN/control
+          echo "Description: Quickly spin up your multi command projects." >> deb/spinup-app/DEBIAN/control
+
           dpkg-deb --build deb/spinup-app
         shell: bash
 
