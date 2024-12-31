@@ -1,16 +1,28 @@
 import { XMarkIcon } from '@heroicons/react/20/solid';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useProjectsStore } from '~/stores/projectsStore';
-import { GetProjectLogs } from 'wjs/go/app/App';
+import { FollowProjectLogs, StopFollowingProjectLogs } from 'wjs/go/app/App';
 import AnsiToHtml from 'ansi-to-html';
+import { EventsOn } from 'wjs/runtime/runtime';
+import { Button } from '~/components/button';
+import { cn } from '~/utils/helpers';
 
 export function LogsPopover() {
   const ansiToHtml = useMemo(() => new AnsiToHtml(), []);
 
   const { currentProject, setCurrentProject } = useProjectsStore();
-  const [logs, setLogs] = useState('');
+  const [ansiLogs, setAnsiLogs] = useState('');
+  const [followLogs, setFollowLogs] = useState(true);
 
-  const logsRef = useRef<HTMLPreElement | null>(null);
+  const logs = useMemo(() => ansiToHtml.toHtml(ansiLogs), [ansiLogs]);
+
+  const logsRef = useRef<HTMLDivElement | null>(null);
+
+  const scrollToBottom = useCallback(() => {
+    setTimeout(() => {
+      logsRef.current?.scrollTo(0, logsRef.current.scrollHeight);
+    }, 10);
+  }, [logsRef]);
 
   const close = useCallback(() => {
     setCurrentProject(null);
@@ -19,16 +31,38 @@ export function LogsPopover() {
   useEffect(() => {
     if (!currentProject) return;
 
-    const interval = setInterval(() => {
-      GetProjectLogs(currentProject).then((newLogs) => {
-        setLogs(ansiToHtml.toHtml(newLogs));
-      });
-    }, 100);
+    FollowProjectLogs(currentProject);
+
+    const stopListeningForLogs = EventsOn('log', (newLogs: string) => {
+      setAnsiLogs((prevLogs) => prevLogs + newLogs);
+    });
+
+    const scrollListener = (e: Event) => {
+      const target = e.target as HTMLElement;
+
+      if (target.scrollTop + target.clientHeight < target.scrollHeight) {
+        setFollowLogs(false);
+      } else {
+        setFollowLogs(true);
+      }
+    };
+
+    logsRef.current?.addEventListener('scroll', scrollListener);
 
     return () => {
-      clearInterval(interval);
+      StopFollowingProjectLogs(currentProject);
+
+      setAnsiLogs('');
+      stopListeningForLogs();
+      logsRef.current?.removeEventListener('scroll', scrollListener);
     };
   }, [currentProject]);
+
+  useEffect(() => {
+    if (followLogs) {
+      scrollToBottom();
+    }
+  }, [followLogs, scrollToBottom, logsRef.current?.scrollHeight]);
 
   if (!currentProject) return null;
 
@@ -36,7 +70,7 @@ export function LogsPopover() {
     <div className="fixed top-0 left-0 w-full h-full bg-black/50" onClick={close}>
       <div className="absolute flex items-center justify-center w-full h-full p-8">
         <div
-          className="flex flex-col w-full h-full max-h-screen p-4 rounded-lg bg-background"
+          className="relative flex flex-col w-full h-full max-h-screen p-4 rounded-lg bg-background"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-center justify-between">
@@ -45,8 +79,12 @@ export function LogsPopover() {
               <XMarkIcon width={24} height={24} />
             </button>
           </div>
-          <div className="w-full h-full mt-4 overflow-scroll rounded-lg bg-black/50">
-            <pre ref={logsRef} className="p-4 text-sm text-wrap" dangerouslySetInnerHTML={{ __html: logs }} />
+          <div ref={logsRef} className="w-full h-full mt-4 overflow-scroll rounded-lg bg-black/50">
+            <pre className="p-4 text-sm text-wrap" dangerouslySetInnerHTML={{ __html: logs }} />
+          </div>
+
+          <div className={cn('absolute -translate-x-1/2 left-1/2 bottom-8 w-fit', followLogs ? 'hidden' : 'flex')}>
+            <Button onClick={scrollToBottom}>Scroll to bottom</Button>
           </div>
         </div>
       </div>
