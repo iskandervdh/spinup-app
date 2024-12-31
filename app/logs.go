@@ -34,8 +34,6 @@ func (a *App) FollowProjectLogs(projectName string) error {
 
 	defer logFile.Close()
 
-	// logEventName := fmt.Sprintf("logs-%s", projectName)
-
 	reader := bufio.NewReader(logFile)
 	runningProject.readingLogs = true
 
@@ -47,8 +45,6 @@ func (a *App) FollowProjectLogs(projectName string) error {
 			time.Sleep(500 * time.Millisecond)
 			continue
 		}
-
-		// fmt.Print(line)
 
 		runtime.EventsEmit(a.ctx, "log", line)
 	}
