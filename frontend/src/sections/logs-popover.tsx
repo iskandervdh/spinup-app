@@ -34,7 +34,16 @@ export function LogsPopover() {
     FollowProjectLogs(currentProject);
 
     const stopListeningForLogs = EventsOn('log', (newLogs: string) => {
-      setAnsiLogs((prevLogs) => prevLogs + newLogs);
+      setAnsiLogs((prevLogs) => {
+        const logs = prevLogs + newLogs;
+
+        // Limit logs to 100k characters to prevent browser from freezing
+        if (logs.length > 100000) {
+          return logs.slice(logs.length - 100000);
+        }
+
+        return logs;
+      });
     });
 
     const scrollListener = (e: Event) => {
