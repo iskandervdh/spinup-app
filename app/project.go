@@ -135,26 +135,3 @@ func (a *App) SelectProjectDirectory(projectName string, defaultDir string) erro
 
 	return nil
 }
-
-func (a *App) GetProjectLogs(projectName string) (string, error) {
-	runningProject, ok := a.runningProjects[projectName]
-
-	if !ok {
-		return "", fmt.Errorf("project '%s' is not running", projectName)
-	}
-
-	logFilePath, err := runningProject.GetLogFilePath()
-
-	if err != nil {
-		fmt.Println(err)
-		return "", fmt.Errorf("no logs available for project '%s'", projectName)
-	}
-
-	logs, err := os.ReadFile(logFilePath)
-
-	if err != nil {
-		return "", fmt.Errorf("error reading logs for project '%s': %s", projectName, err)
-	}
-
-	return string(logs), nil
-}

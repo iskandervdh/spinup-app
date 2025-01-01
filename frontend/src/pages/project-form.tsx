@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Input } from '~/components/input';
 import { PageTitle } from '~/components/page-title';
-import { Select } from '~/components/select';
 import { useCommandsStore } from '~/stores/commandsStore';
 import { useProjectsStore } from '~/stores/projectsStore';
 import { GetCommands } from 'wjs/go/app/App';
 import { Button } from '~/components/button';
 import { Page, usePageStore } from '~/stores/pageStore';
 import { SelectMultiple } from '~/components/select-multiple';
+import toast from 'react-hot-toast';
 
 export function ProjectFormPage() {
   const { commands, setCommands } = useCommandsStore();
@@ -30,15 +30,30 @@ export function ProjectFormPage() {
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
 
-      try {
-        await projectFormSubmit(name, domain, port, commandNames);
-        setCurrentPage(Page.Projects);
-      } catch (e) {
-        // TODO: Show error toast
-        console.error(e);
-      }
+      await toast
+        .promise(projectFormSubmit(name, domain, port, commandNames), {
+          loading: editingProject ? 'Saving project...' : 'Creating project...',
+          success: editingProject ? <b>Project saved</b> : <b>Project created</b>,
+          error: (err) =>
+            editingProject ? (
+              <b>
+                Failed to save project:
+                <br />
+                {err}
+              </b>
+            ) : (
+              <b>
+                Failed to create project:
+                <br />
+                {err}
+              </b>
+            ),
+        })
+        .then(() => {
+          setCurrentPage(Page.Projects);
+        });
     },
-    [name, domain, port, commandNames, projectFormSubmit]
+    [name, domain, port, commandNames, editingProject, projectFormSubmit]
   );
 
   useEffect(() => {

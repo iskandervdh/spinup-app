@@ -13,10 +13,11 @@ import (
 )
 
 type runningProject struct {
-	core      *core.Core
-	msgChan   *chan common.Msg
-	msgChanWg *sync.WaitGroup
-	logFile   *os.File
+	core        *core.Core
+	msgChan     *chan common.Msg
+	msgChanWg   *sync.WaitGroup
+	logFile     *os.File
+	readingLogs bool
 }
 
 func NewRunningProject() *runningProject {
