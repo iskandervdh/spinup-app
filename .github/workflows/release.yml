@@ -87,8 +87,10 @@ jobs:
         if: runner.os == 'Linux'
         working-directory: ${{ env.WORKING_DIRECTORY }}
         run: |
-          wails build --platform ${{ matrix.build.platform }} -webview2 ${{ env.WEBVIEW2 }} -o ${{ matrix.build.name }}-webkit2-40 -tags webkit2_40
-          wails build --platform ${{ matrix.build.platform }} -webview2 ${{ env.WEBVIEW2 }} -o ${{ matrix.build.name }}-webkit2-41 -tags webkit2_41
+          SPINUP_APP_VERSION=$(cat ./app/.version | sed 's/^v//')
+
+          wails build --platform ${{ matrix.build.platform }} -webview2 ${{ env.WEBVIEW2 }} -o ${{ matrix.build.name }}-${SPINUP_APP_VERSION}-webkit2-40 -tags webkit2_40
+          wails build --platform ${{ matrix.build.platform }} -webview2 ${{ env.WEBVIEW2 }} -o ${{ matrix.build.name }}-${SPINUP_APP_VERSION}-webkit2-41 -tags webkit2_41
         shell: bash
       # - name: Build macOs App
       #   if: runner.os == 'macOS'
@@ -123,24 +125,24 @@ jobs:
         if: runner.os == 'Linux'
         working-directory: ${{ env.WORKING_DIRECTORY }}
         run: |
-          SPINUP_APP_VERSION=${$(cat ./app/.version)/v/""}
+          SPINUP_APP_VERSION=$(cat ./app/.version | sed 's/^v//')
 
           for webkit_version in 40 41; do
-            mkdir -p deb/spinup-app-${SPINUP_APP_VERSION}-webkit-${webkit_version}/DEBIAN
-            mkdir -p deb/spinup-app-${SPINUP_APP_VERSION}-webkit-${webkit_version}/usr/share/spinup/bin
-            cp build/bin/spinup-app-webkit2-${webkit_version} deb/spinup-app-${SPINUP_APP_VERSION}-webkit-${webkit_version}/usr/share/spinup/bin/spinup-app
-            cp build/DEBIAN/* deb/spinup-app-${SPINUP_APP_VERSION}-webkit-${webkit_version}/DEBIAN
-            cp -r build/share deb/spinup-app-${SPINUP_APP_VERSION}-webkit-${webkit_version}/usr
+            mkdir -p deb/spinup-app-${SPINUP_APP_VERSION}-webkit2-${webkit_version}/DEBIAN
+            mkdir -p deb/spinup-app-${SPINUP_APP_VERSION}-webkit2-${webkit_version}/usr/share/spinup/bin
+            cp build/bin/spinup-app-${SPINUP_APP_VERSION}-webkit2-${webkit_version} deb/spinup-app-${SPINUP_APP_VERSION}-webkit2-${webkit_version}/usr/share/spinup/bin/spinup-app
+            cp build/DEBIAN/* deb/spinup-app-${SPINUP_APP_VERSION}-webkit2-${webkit_version}/DEBIAN
+            cp -r build/share deb/spinup-app-${SPINUP_APP_VERSION}-webkit2-${webkit_version}/usr
 
-            echo -e "\nVersion: $SPINUP_APP_VERSION" >> deb/spinup-app-${SPINUP_APP_VERSION}-webkit-${webkit_version}/DEBIAN/control
+            echo -e "\nVersion: $SPINUP_APP_VERSION" >> deb/spinup-app-${SPINUP_APP_VERSION}-webkit2-${webkit_version}/DEBIAN/control
 
             if [ "$webkit_version" -eq "40" ]; then
-              echo "Depends: libgtk-3-0, libwebkit2gtk-4.0-dev" >> deb/spinup-app-${SPINUP_APP_VERSION}-webkit-${webkit_version}/DEBIAN/control
+              echo "Depends: libgtk-3-0, libwebkit2gtk-4.0-dev" >> deb/spinup-app-${SPINUP_APP_VERSION}-webkit2-${webkit_version}/DEBIAN/control
             else
-              echo "Depends: libgtk-3-0, libwebkit2gtk-4.1-dev" >> deb/spinup-app-${SPINUP_APP_VERSION}-webkit-${webkit_version}/DEBIAN/control
+              echo "Depends: libgtk-3-0, libwebkit2gtk-4.1-dev" >> deb/spinup-app-${SPINUP_APP_VERSION}-webkit2-${webkit_version}/DEBIAN/control
             fi
 
-            sudo chown -R root:root deb/spinup-app-${SPINUP_APP_VERSION}-webkit-${webkit_version}
+            sudo chown -R root:root deb/spinup-app-${SPINUP_APP_VERSION}-webkit2-${webkit_version}
 
             dpkg-deb --build deb/spinup-app-${SPINUP_APP_VERSION}-webkit2-${webkit_version}
           done
