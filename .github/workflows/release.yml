@@ -140,6 +140,8 @@ jobs:
               echo "Depends: libgtk-3-0, libwebkit2gtk-4.1-dev" >> deb/spinup-app-${SPINUP_APP_VERSION}-webkit-${webkit_version}/DEBIAN/control
             fi
 
+            sudo chown -R root:root deb/spinup-app-${SPINUP_APP_VERSION}-webkit-${webkit_version}
+
             dpkg-deb --build deb/spinup-app-${SPINUP_APP_VERSION}-webkit2-${webkit_version}
           done
         shell: bash
