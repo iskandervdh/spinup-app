@@ -64,6 +64,6 @@ jobs:
         if: runner.os == 'Linux'
         working-directory: ${{ env.WORKING_DIRECTORY }}
         run: |
-          wails build --platform ${{ matrix.build.platform }} -webview2 ${{ env.WEBVIEW2 }} -o ${{ matrix.build.name }}-webkit2-40 -tags webkit2_40
-          wails build --platform ${{ matrix.build.platform }} -webview2 ${{ env.WEBVIEW2 }} -o ${{ matrix.build.name }}-webkit2-41 -tags webkit2_41
+          wails build --platform ${{ matrix.build.platform }} -webview2 ${{ env.WEBVIEW2 }} -o pr-webkit2-40 -tags webkit2_40
+          wails build --platform ${{ matrix.build.platform }} -webview2 ${{ env.WEBVIEW2 }} -o pr-webkit2-41 -tags webkit2_41
         shell: bash
