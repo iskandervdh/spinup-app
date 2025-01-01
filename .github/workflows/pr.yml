@@ -42,8 +42,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'pnpm'
-          cache-dependency-path: './frontend/pnpm-lock.yaml'
+          # cache: 'pnpm'
+          # cache-dependency-path: './frontend/pnpm-lock.yaml'
 
       # install Wails
       - name: Install Wails
