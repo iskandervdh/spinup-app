@@ -52,11 +52,11 @@ export function CommandFormPage() {
 
   useEffect(() => {
     if (editingCommand) {
-      const command = commands?.[editingCommand];
+      const command = commands?.find((c) => c.Name === editingCommand);
 
       if (command) {
         setName(editingCommand);
-        setCommand(command);
+        setCommand(command.Command);
       }
     }
   }, [editingCommand, setName, setCommand]);

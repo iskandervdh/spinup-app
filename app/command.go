@@ -4,9 +4,10 @@ import (
 	"fmt"
 
 	"github.com/iskandervdh/spinup/common"
+	"github.com/iskandervdh/spinup/core"
 )
 
-func (a *App) GetCommands() map[string]string {
+func (a *App) GetCommands() []core.Command {
 	commands, err := a.core.GetCommands()
 
 	if err != nil {
@@ -19,7 +20,7 @@ func (a *App) GetCommands() map[string]string {
 }
 
 func (a *App) AddCommand(name string, command string) error {
-	err := a.core.GetCommandsConfig()
+	err := a.core.FetchCommands()
 
 	if err != nil {
 		return fmt.Errorf("error getting commands config: %s", err)
@@ -36,7 +37,7 @@ func (a *App) AddCommand(name string, command string) error {
 }
 
 func (a *App) UpdateCommand(name string, command string) error {
-	err := a.core.GetCommandsConfig()
+	err := a.core.FetchCommands()
 
 	if err != nil {
 		return fmt.Errorf("error getting commands config: %s", err)
@@ -53,7 +54,7 @@ func (a *App) UpdateCommand(name string, command string) error {
 }
 
 func (a *App) RemoveCommand(name string) error {
-	err := a.core.GetCommandsConfig()
+	err := a.core.FetchCommands()
 
 	if err != nil {
 		return fmt.Errorf("error getting commands config: %s", err)

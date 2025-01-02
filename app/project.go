@@ -9,13 +9,13 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-func (a *App) GetProjects() map[string]core.Project {
-	err := a.core.GetCommandsConfig()
+func (a *App) GetProjects() []core.Project {
+	err := a.core.FetchCommands()
 	if err != nil {
 		fmt.Println("Error getting commands config:", err)
 	}
 
-	err = a.core.GetProjectsConfig()
+	err = a.core.FetchProjects()
 
 	if err != nil {
 		fmt.Println("Error getting projects config:", err)
@@ -32,14 +32,14 @@ func (a *App) GetProjects() map[string]core.Project {
 	return projects
 }
 
-func (a *App) AddProject(name string, domain string, port int, commandNames []string) error {
-	err := a.core.GetCommandsConfig()
+func (a *App) AddProject(name string, domain string, port int64, commandNames []string) error {
+	err := a.core.FetchCommands()
 
 	if err != nil {
 		return fmt.Errorf("error getting commands config: %s", err)
 	}
 
-	err = a.core.GetProjectsConfig()
+	err = a.core.FetchProjects()
 
 	if err != nil {
 		return fmt.Errorf("error getting projects config: %s", err)
@@ -55,14 +55,14 @@ func (a *App) AddProject(name string, domain string, port int, commandNames []st
 	return nil
 }
 
-func (a *App) UpdateProject(name string, domain string, port int, commandNames []string) error {
-	err := a.core.GetCommandsConfig()
+func (a *App) UpdateProject(name string, domain string, port int64, commandNames []string) error {
+	err := a.core.FetchCommands()
 
 	if err != nil {
 		return fmt.Errorf("error getting commands config: %s", err)
 	}
 
-	err = a.core.GetProjectsConfig()
+	err = a.core.FetchProjects()
 
 	if err != nil {
 		return fmt.Errorf("error getting projects config: %s", err)
@@ -79,13 +79,13 @@ func (a *App) UpdateProject(name string, domain string, port int, commandNames [
 }
 
 func (a *App) RemoveProject(name string) error {
-	err := a.core.GetCommandsConfig()
+	err := a.core.FetchCommands()
 
 	if err != nil {
 		return fmt.Errorf("error getting commands config: %s", err)
 	}
 
-	err = a.core.GetProjectsConfig()
+	err = a.core.FetchProjects()
 
 	if err != nil {
 		return fmt.Errorf("error getting projects config: %s", err)

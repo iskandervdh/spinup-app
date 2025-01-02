@@ -26,13 +26,13 @@ func (a *App) Startup(ctx context.Context) {
 	a.ctx = ctx
 	a.core = core.New()
 
-	err := a.core.GetCommandsConfig()
+	err := a.core.FetchCommands()
 
 	if err != nil {
 		fmt.Println("Error getting commands config:", err)
 	}
 
-	err = a.core.GetProjectsConfig()
+	err = a.core.FetchProjects()
 
 	if err != nil {
 		fmt.Println("Error getting projects config:", err)

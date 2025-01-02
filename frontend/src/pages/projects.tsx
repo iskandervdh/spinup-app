@@ -8,6 +8,7 @@ import {
   DocumentTextIcon,
   PencilSquareIcon,
   FolderIcon,
+  InformationCircleIcon,
 } from '@heroicons/react/20/solid';
 import { GetProjects } from '../../wailsjs/go/app/App';
 import { useCallback, useEffect, useMemo } from 'react';
@@ -20,7 +21,7 @@ import { LogsPopover } from '~/sections/logs-popover';
 import { core } from 'wjs/go/models';
 import toast from 'react-hot-toast';
 
-function ProjectInfo({ name, project }: { name: string; project: core.Project }) {
+function ProjectInfo({ project }: { project: core.Project }) {
   const {
     runningProjects,
     runProject,
@@ -32,58 +33,63 @@ function ProjectInfo({ name, project }: { name: string; project: core.Project })
   } = useProjectsStore();
   const { setCurrentPage } = usePageStore();
 
-  const isRunning = useMemo(() => runningProjects.includes(name), [runningProjects]);
-  const commands = useMemo(() => project.commands.join(', '), [project.commands]);
-  const variables = useMemo(() => {
-    return Object.entries(project.variables)
-      .map(([key, value]) => `${key}=${value}`)
-      .join(', ');
-  }, [project.variables]);
-  const domainAliases = useMemo(() => project.domainAliases.join(', '), [project.domainAliases]);
+  const isRunning = useMemo(() => runningProjects.includes(project.Name), [runningProjects]);
+  const commands = useMemo(() => project.Commands.map((c) => c.Name).join(', '), [project.Commands]);
+  const variables = useMemo(
+    () => project.Variables?.map((v) => `${v.Name}=${v.Value}`).join(', '),
+    [project.Variables]
+  );
+  const domainAliases = useMemo(() => project.DomainAliases?.map((da) => da.Value).join(', '), [project.DomainAliases]);
 
-  const canRunProject = useMemo(() => project.dir && project.commands.length > 0, [project.dir, project.commands]);
+  const canRunProject = useMemo(
+    () => project.Dir.Valid && project.Commands.length > 0,
+    [project.Dir, project.Commands]
+  );
   const cannotRunProjectReason = useMemo(() => {
-    if (!project.dir) return 'Project directory is not set';
-    if (project.commands.length === 0) return 'No commands set for this project';
+    if (!project.Dir.Valid) return 'Project directory is not set';
+    if (project.Commands.length === 0) return 'No commands set for this project';
     return '';
-  }, [project.dir, project.commands]);
+  }, [project.Dir, project.Commands]);
 
   const openProjectInBrowser = useCallback(() => {
-    BrowserOpenURL(`http://${project.domain}`);
-  }, [project.domain]);
+    BrowserOpenURL(`http://${project.Domain}`);
+  }, [project.Domain]);
 
-  const openProjectDir = useCallback(() => project.dir && BrowserOpenURL(project.dir), [project.dir]);
+  const openProjectDir = useCallback(() => project.Dir.Valid && BrowserOpenURL(project.Dir.String), [project.Dir]);
 
-  const openSelectProjectDir = useCallback(() => selectProjectDir(name, project.dir), [name, project.dir]);
+  const openSelectProjectDir = useCallback(
+    () => selectProjectDir(project.Name, project.Dir.String),
+    [project.Name, project.Dir.String]
+  );
 
   const startOrStopProject = useCallback(async () => {
     if (isRunning) {
-      await stopProject(name);
+      await stopProject(project.Name);
     } else {
-      await runProject(name);
+      await runProject(project.Name);
     }
   }, [isRunning]);
 
   const showLogs = useCallback(() => {
     if (isRunning) {
-      setCurrentProject(name);
+      setCurrentProject(project.Name);
     } else {
       alert('Project is not running');
     }
-  }, [name, isRunning]);
+  }, [project.Name, isRunning]);
 
   const edit = useCallback(() => {
-    setEditingProject(name);
+    setEditingProject(project.Name);
     setCurrentPage(Page.ProjectForm);
-  }, [name, setEditingProject, setCurrentPage]);
+  }, [project.Name, setEditingProject, setCurrentPage]);
 
   const remove = useCallback(async () => {
-    if (confirm(`Are you sure you want to remove project "${name}"?`)) {
-      await removeProject(name);
+    if (confirm(`Are you sure you want to remove project "${project.Name}"?`)) {
+      await removeProject(project.Name);
 
-      toast.success(<b>Removed project "${name}"</b>);
+      toast.success(<b>Removed project "{project.Name}"</b>);
     }
-  }, [name, removeProject]);
+  }, [project.Name, removeProject]);
 
   return (
     <div>
@@ -107,7 +113,7 @@ function ProjectInfo({ name, project }: { name: string; project: core.Project })
         )}
 
         <div className="flex items-center gap-2">
-          <h3 className="pr-2 text-xl font-bold text-primary">{name}</h3>
+          <h3 className="pr-2 text-xl font-bold text-primary">{project.Name}</h3>
 
           <Button onClick={edit} size={'xs'} title="Edit project">
             <PencilSquareIcon width={16} height={16} className="text-current" />
@@ -133,20 +139,20 @@ function ProjectInfo({ name, project }: { name: string; project: core.Project })
             onClick={openProjectInBrowser}
             className="text-sm underline cursor-pointer text-info hover:text-info-dark"
           >
-            {project.domain}
+            {project.Domain}
           </div>
         ) : (
-          <div className="text-sm">{project.domain}</div>
+          <div className="text-sm">{project.Domain}</div>
         )}
 
         <div>Port</div>
-        <div className="text-sm">{project.port}</div>
+        <div className="text-sm">{project.Port}</div>
 
         <div>Commands</div>
         {commands !== '' ? <div className="text-sm">{commands}</div> : <div className="text-sm text-error">-</div>}
 
         <div>Directory</div>
-        {project.dir ? (
+        {project.Dir.Valid ? (
           <div className="flex items-center gap-2 py-1">
             <Button onClick={openProjectDir} size={'xs'} title="Open project directory">
               <FolderIcon width={16} height={16} className="text-current" />
@@ -179,7 +185,7 @@ export function ProjectsPage() {
   const { projects, setProjects, setEditingProject } = useProjectsStore();
 
   useEffect(() => {
-    GetProjects().then(setProjects);
+    GetProjects().then((projects) => setProjects(projects || []));
   }, []);
 
   return (
@@ -210,7 +216,29 @@ export function ProjectsPage() {
 
       <div className="flex flex-col gap-4">
         {projects ? (
-          Object.entries(projects).map(([name, project]) => <ProjectInfo key={name} name={name} project={project} />)
+          projects.length === 0 ? (
+            <div className="flex flex-col gap-4 py-2">
+              <div className="flex items-center gap-2 text-lg text-gray-300">
+                <InformationCircleIcon width={24} height={24} className="text-info" />
+                <span>No projects found.</span>
+              </div>
+
+              <div>
+                <Button
+                  onClick={() => {
+                    setEditingProject(null);
+                    setCurrentPage(Page.ProjectForm);
+                  }}
+                  size={'xs'}
+                  variant={'success'}
+                >
+                  Add a project
+                </Button>
+              </div>
+            </div>
+          ) : (
+            projects.map((project) => <ProjectInfo key={project.ID} project={project} />)
+          )
         ) : (
           <p>Loading...</p>
         )}

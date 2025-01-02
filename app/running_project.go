@@ -26,8 +26,8 @@ func NewRunningProject() *runningProject {
 	msgChanWg := sync.WaitGroup{}
 	core := core.New(core.WithMsgChan(&msgChan))
 
-	core.GetCommandsConfig()
-	core.GetProjectsConfig()
+	core.FetchCommands()
+	core.FetchProjects()
 
 	rp := &runningProject{
 		core:      core,

@@ -11,7 +11,7 @@ import toast from 'react-hot-toast';
 
 export function ProjectFormPage() {
   const { commands, setCommands } = useCommandsStore();
-  const { projects, projectFormSubmit, editingProject, setEditingProject } = useProjectsStore();
+  const { projects, projectFormSubmit, editingProject } = useProjectsStore();
   const { setCurrentPage } = usePageStore();
 
   const [name, setName] = useState('');
@@ -62,13 +62,13 @@ export function ProjectFormPage() {
 
   useEffect(() => {
     if (editingProject) {
-      const project = projects?.[editingProject];
+      const project = projects?.find((p) => p.Name === editingProject);
 
       if (project) {
         setName(editingProject);
-        setDomain(project.domain);
-        setPort(project.port);
-        setCommandNames(project.commands);
+        setDomain(project.Domain);
+        setPort(project.Port);
+        setCommandNames(project.Commands.map((c) => c.Name));
       }
     }
   }, [editingProject, setName, setDomain, setPort, setCommandNames]);
@@ -114,7 +114,7 @@ export function ProjectFormPage() {
           <SelectMultiple
             id="commands"
             name="commands"
-            options={commands ? Object.keys(commands) : []}
+            options={commands ? commands.map((c) => c.Name) : []}
             value={commandNames}
             onChanged={setCommandNames}
           />

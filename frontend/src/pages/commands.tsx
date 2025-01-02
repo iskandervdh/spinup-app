@@ -3,31 +3,32 @@ import { PageTitle } from '../components/page-title';
 import { GetCommands } from '../../wailsjs/go/app/App';
 import { useCommandsStore } from '~/stores/commandsStore';
 import { Button } from '~/components/button';
-import { ArrowPathIcon, PencilSquareIcon, PlusIcon, TrashIcon } from '@heroicons/react/20/solid';
+import { ArrowPathIcon, InformationCircleIcon, PencilSquareIcon, PlusIcon, TrashIcon } from '@heroicons/react/20/solid';
 import { Page, usePageStore } from '~/stores/pageStore';
 import toast from 'react-hot-toast';
+import { sqlc } from 'wjs/go/models';
 
-function CommandInfo({ name, command }: { name: string; command: string }) {
+function CommandInfo({ command }: { command: sqlc.Command }) {
   const { setCurrentPage } = usePageStore();
   const { removeCommand, setEditingCommand } = useCommandsStore();
 
   const edit = useCallback(() => {
-    setEditingCommand(name);
+    setEditingCommand(command.Name);
     setCurrentPage(Page.CommandForm);
-  }, [name, setEditingCommand, setCurrentPage]);
+  }, [command.Name, setEditingCommand, setCurrentPage]);
 
   const remove = useCallback(async () => {
-    if (confirm(`Are you sure you want to remove command "${name}"?`)) {
-      await removeCommand(name);
+    if (confirm(`Are you sure you want to remove command "${command.Name}"?`)) {
+      await removeCommand(command.Name);
 
-      toast.success(<b>Removed command "{name}"</b>);
+      toast.success(<b>Removed command "{command.Name}"</b>);
     }
-  }, [name, removeCommand]);
+  }, [command.Name, removeCommand]);
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-2">
-        <h3 className="pr-2 text-xl font-bold text-primary">{name}</h3>
+        <h3 className="pr-2 text-xl font-bold text-primary">{command.Name}</h3>
 
         <Button onClick={edit} size={'xs'} title="Edit command">
           <PencilSquareIcon width={16} height={16} className="text-current" />
@@ -40,7 +41,7 @@ function CommandInfo({ name, command }: { name: string; command: string }) {
 
       <div className="grid grid-cols-[16rem,auto]">
         <div>Command</div>
-        <div className="text-sm">{command}</div>
+        <div className="text-sm">{command.Command}</div>
       </div>
     </div>
   );
@@ -51,7 +52,7 @@ export function CommandsPage() {
   const { commands, setCommands, setEditingCommand } = useCommandsStore();
 
   useEffect(() => {
-    GetCommands().then(setCommands);
+    GetCommands().then((commands) => setCommands(commands || []));
   }, []);
 
   return (
@@ -80,7 +81,29 @@ export function CommandsPage() {
 
       <div className="flex flex-col gap-4">
         {commands ? (
-          Object.entries(commands).map(([name, command]) => <CommandInfo key={name} name={name} command={command} />)
+          commands.length === 0 ? (
+            <div className="flex flex-col gap-4 py-2">
+              <div className="flex items-center gap-2 text-lg text-gray-300">
+                <InformationCircleIcon width={24} height={24} className="text-info" />
+                <span>No commands found.</span>
+              </div>
+
+              <div>
+                <Button
+                  onClick={() => {
+                    setEditingCommand(null);
+                    setCurrentPage(Page.CommandForm);
+                  }}
+                  size={'xs'}
+                  variant={'success'}
+                >
+                  Add a command
+                </Button>
+              </div>
+            </div>
+          ) : (
+            commands.map((command) => <CommandInfo key={command.ID} command={command} />)
+          )
         ) : (
           <p>Loading...</p>
         )}

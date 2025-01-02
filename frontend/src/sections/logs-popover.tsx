@@ -1,4 +1,4 @@
-import { XMarkIcon } from '@heroicons/react/20/solid';
+import { ArrowDownIcon, XMarkIcon } from '@heroicons/react/20/solid';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useProjectsStore } from '~/stores/projectsStore';
 import { FollowProjectLogs, StopFollowingProjectLogs } from 'wjs/go/app/App';
@@ -93,7 +93,11 @@ export function LogsPopover() {
           </div>
 
           <div className={cn('absolute -translate-x-1/2 left-1/2 bottom-8 w-fit', followLogs ? 'hidden' : 'flex')}>
-            <Button onClick={scrollToBottom}>Scroll to bottom</Button>
+            <Button onClick={scrollToBottom} className="flex items-center gap-1">
+              <ArrowDownIcon width={16} height={16} />
+              <span>Scroll to bottom</span>
+              <ArrowDownIcon width={16} height={16} />
+            </Button>
           </div>
         </div>
       </div>
